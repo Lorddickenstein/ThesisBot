@@ -27,7 +27,7 @@ class MyClient(discord.Client):
             await message.channel.send('Bore Ragnarok!')
 
         if any(words in msg for words in self.sorry_words):
-            await message.channel.send('Stop apologizing!!! It\'s CRINGE!!!')
+            await message.channel.send('Stop apologizing so much!!! It\'s CRINGE!!!')
 
         if msg == '#list':
             cmd = '```[Available commands]\n\n'
