@@ -1,5 +1,5 @@
 import discord
-from mypackage.config import BOT_TOKEN, COMMANDS, SORRY_WORDS
+from mypackage.config import BOT_TOKEN, COMMANDS, SORRY_WORDS, CATEGORIES, BLACKLISTED
 
 class MyClient(discord.Client):
 
@@ -28,6 +28,11 @@ class MyClient(discord.Client):
                 response += '\t' + command.get('command') + ' - ' + command.get('response') + '\n'
             response += '```'
             await message.channel.send(response)
+
+        if msg == '!dad-jokes':
+            dadjoke = Dadjoke()
+            response = dadjoke.joke
+            await message.channel.send('*' + response + '*')
 
 
 client = MyClient()

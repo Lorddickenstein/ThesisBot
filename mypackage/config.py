@@ -7,4 +7,6 @@ COMMANDS = [
         {'command': 'literally anything? more like', 'response': 'more like Bore Ragnarok!'},
     ]
 
-SORRY_WORDS = ['sorry', 'sorre', 'sorreh', 'sorrey', 'sori']
+SORRY_WORDS = ['sorry', 'sorre', 'sorreh', 'sorrey', 'sori', '!sorry']
+BLACKLISTED = ['nsfw', 'religious', 'political', 'racist', 'sexist', 'explicit']
+CATEGORIES = ['any', 'misc', 'programming', 'dark', 'pun', 'spooky', 'christmas']
