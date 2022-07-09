@@ -34,6 +34,11 @@ class MyClient(discord.Client):
                 cmd += '\t' + command.get('command') + ' - ' + command.get('response') +'\n'
             await message.channel.send(cmd + '```')
 
+    @client.command()
+    async def italic(ctx):
+        response = 'This text has some words *emphasized* in _different_ ways'
+        await ctx.send(response)
+
 
 client = MyClient()
 client.run(BOT_TOKEN)
