@@ -31,7 +31,7 @@ class MyClient(discord.Client):
         if msg == '!list':
             cmd = '```[Available commands]\n\n'
             for command in self.commands:
-                cmd += '\t_' + command.get('command') + '_ - ' + command.get('response') +'\n'
+                cmd += '\t*' + command.get('command') + '* - ' + command.get('response') +'\n'
             await message.channel.send(cmd + '```')
 
 
