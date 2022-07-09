@@ -23,21 +23,23 @@ class MyClient(discord.Client):
             return
 
         if msg.endswith('? more like') or  msg.endswith('more like'):
-            await message.channel.send('Bore Ragnarok!')
+            response = 'Bore Ragnarok'
+            await message.channel.send(response)
 
         if any(words in msg for words in self.sorry_words):
-            await message.channel.send('Stop apologizing so much!!! It\'s CRINGE!!!')
+            response = 'Stop apologizing so much!!! It\'s CRINGE!!!'
+            await message.channel.send(response)
 
         if msg == '!list':
-            cmd = '```[Available commands]\n\n'
+            response = '```[Available commands]\n\n'
             for command in self.commands:
-                cmd += '\t' + command.get('command') + ' - ' + command.get('response') +'\n'
-            await message.channel.send(cmd + '```')
+                response += '\t' + command.get('command') + ' - ' + command.get('response') +'\n'
+            response += '```'
+            await message.channel.send(response)
 
-    @client.command()
-    async def italic(ctx):
-        response = 'This text has some words *emphasized* in _different_ ways'
-        await ctx.send(response)
+        if msg == '!test':
+            response = 'This text has some words *emphasized* in _different_ ways'
+            await message.channel.send(response)
 
 
 client = MyClient()
