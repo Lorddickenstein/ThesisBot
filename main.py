@@ -8,7 +8,7 @@ class MyClient(discord.Client):
         {'command': '!list', 'response': 'lists all commands'},
         {'command': 'sorry', 'response': 'NEVER USE THIS COMMAND. THIS IS FORBIDDEN!!!'},
         {'command': 'more like', 'response': 'more like Bore Ragnarok!'},
-        {'command': '*literally anything*? more like', 'response': 'more like Bore Ragnarok!'},
+        {'command': 'literally anything? more like', 'response': 'more like Bore Ragnarok!'},
     ]
 
     async def on_ready(self):
@@ -33,14 +33,8 @@ class MyClient(discord.Client):
         if msg == '!list':
             response = '```[Available commands]\n\n'
             for command in self.commands:
-                print(command.get('command'))
-                response += '\t' + command.get('command') + ' - *' + command.get('response') + '*' +'\n'
+                response += '\t' + command.get('command') + ' - ' + command.get('response') + '\n'
             response += '```'
-            print(response)
-            await message.channel.send(response)
-
-        if msg == '!test':
-            response = 'This text has some words *emphasized* in _different_ ways'
             await message.channel.send(response)
 
 
