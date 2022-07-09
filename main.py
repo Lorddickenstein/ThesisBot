@@ -33,8 +33,10 @@ class MyClient(discord.Client):
         if msg == '!list':
             response = '```[Available commands]\n\n'
             for command in self.commands:
+                print(command.get('command'))
                 response += '\t' + command.get('command') + ' - *' + command.get('response') + '*' +'\n'
             response += '```'
+            print(response)
             await message.channel.send(response)
 
         if msg == '!test':
