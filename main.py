@@ -5,11 +5,10 @@ class MyClient(discord.Client):
 
     sorry_words = ['sorry', 'sorre', 'sorreh', 'sorrey', 'sori']
     commands = [
-        {'command': '#list', 'response': 'lists all commands'},
-        {'command': '#more like', 'response': 'more like Bore Ragnarok!'},
+        {'command': '!list', 'response': 'lists all commands'},
+        {'command': 'sorry', 'response': 'NEVER USE THIS COMMAND. THIS IS FORBIDDEN!!!'},
         {'command': 'more like', 'response': 'more like Bore Ragnarok!'},
         {'command': '<literally anything>? more like', 'response': 'more like Bore Ragnarok!'},
-        {'command': 'sorry', 'response': 'THIS IS FORBIDDEN!!!'}
     ]
 
     async def on_ready(self):
@@ -32,7 +31,7 @@ class MyClient(discord.Client):
         if msg == '!list':
             cmd = '```[Available commands]\n\n'
             for command in self.commands:
-                cmd += '\t' + command.get('command') + ' - ' + command.get('response') +'\n'
+                cmd += '\t_' + command.get('command') + '_ - ' + command.get('response') +'\n'
             await message.channel.send(cmd + '```')
 
 
