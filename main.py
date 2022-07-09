@@ -1,4 +1,5 @@
 import discord
+from dadjokes import Dadjoke
 from mypackage.config import BOT_TOKEN, COMMANDS, SORRY_WORDS, CATEGORIES, BLACKLISTED
 
 class MyClient(discord.Client):
