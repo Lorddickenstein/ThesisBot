@@ -29,7 +29,7 @@ class MyClient(discord.Client):
         if any(words in msg for words in self.sorry_words):
             await message.channel.send('Stop apologizing so much!!! It\'s CRINGE!!!')
 
-        if msg == '#list':
+        if msg == '!list':
             cmd = '```[Available commands]\n\n'
             for command in self.commands:
                 cmd += '\t' + command.get('command') + ' - ' + command.get('response') +'\n'
