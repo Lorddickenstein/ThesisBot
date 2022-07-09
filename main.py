@@ -1,15 +1,7 @@
 import discord
-from mypackage.config import BOT_TOKEN
+from mypackage.config import BOT_TOKEN, COMMANDS, SORRY_WORDS
 
 class MyClient(discord.Client):
-
-    sorry_words = ['sorry', 'sorre', 'sorreh', 'sorrey', 'sori']
-    commands = [
-        {'command': '!list', 'response': 'lists all commands'},
-        {'command': 'sorry', 'response': 'NEVER USE THIS COMMAND. THIS IS FORBIDDEN!!!'},
-        {'command': 'more like', 'response': 'more like Bore Ragnarok!'},
-        {'command': 'literally anything? more like', 'response': 'more like Bore Ragnarok!'},
-    ]
 
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
@@ -26,13 +18,13 @@ class MyClient(discord.Client):
             response = 'Bore Ragnarok'
             await message.channel.send(response)
 
-        if any(words in msg for words in self.sorry_words):
+        if any(words in msg for words in self.SORRY_WORDS):
             response = 'Stop apologizing so much!!! It\'s CRINGE!!!'
             await message.channel.send(response)
 
         if msg == '!list':
             response = '```[Available commands]\n\n'
-            for command in self.commands:
+            for command in self.COMMANDS:
                 response += '\t' + command.get('command') + ' - ' + command.get('response') + '\n'
             response += '```'
             await message.channel.send(response)
