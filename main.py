@@ -11,11 +11,18 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         print('Message from {0.author}: {0.content}'.format(message))
 
+        def find_specific_joke(jokes, category):
+            for joke in jokes['jokes']:
+                if joke['flags'][category]:
+                    return joke
+            return
+
         msg = message.content.lower()
 
         if message.author == self.user:
             return
 
+        # more like Bore Ragnarok!
         if msg.endswith('? more like') or  msg.endswith('more like'):
             response = 'Bore Ragnarok'
             await message.channel.send(response)
@@ -24,6 +31,7 @@ class MyClient(discord.Client):
             response = 'Stop apologizing so much!!! It\'s CRINGE!!!'
             await message.channel.send(response)
 
+        # !list
         if msg == '!list':
             response = '```[Available commands]\n\n'
             for command in COMMANDS:
@@ -31,30 +39,28 @@ class MyClient(discord.Client):
             response += '```'
             await message.channel.send(response)
 
+        # !dad-jokes
         if msg == '!dad-jokes':
             dadjoke = Dadjoke()
             response = dadjoke.joke
             await message.channel.send('*' + response + '*')
 
+        # !jokes
         if msg.startswith('!jokes'):
             j = await Jokes()
             params = msg.split('-')
 
             if len(params) > 1:
-                if params[1] in BLACKLISTED:
+                _, category = params
+                if category in BLACKLISTED:
                     while True:
-                        flag = False
                         jokes = await j.get_joke(amount=10)
-                        for jk in jokes['jokes']:
-                            if jk['flags'][params[1]]:
-                                joke = jk
-                                flag = True
-                                break
-
-                        if flag:
+                        joke = find_specific_joke(jokes, category)
+                        if joke:
                             break
-                elif params[1] in CATEGORIES:
-                    joke = await j.get_joke(category=[params[1]])
+                        
+                elif category in CATEGORIES:
+                    joke = await j.get_joke(category=[category])
             else:
                 joke = await j.get_joke()
 
