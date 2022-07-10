@@ -11,7 +11,7 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         print('Message from {0.author}: {0.content}'.format(message))
 
-        def find_specific_joke(self, jokes, category):
+        def find_specific_joke(jokes, category):
             for joke in jokes['jokes']:
                 if joke['flags'][category]:
                     return joke
