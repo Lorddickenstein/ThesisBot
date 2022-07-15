@@ -1,7 +1,7 @@
 import discord
 from dadjokes import Dadjoke
 from jokeapi import Jokes
-from mypackage.config import BOT_TOKEN, COMMANDS, SORRY_WORDS, CATEGORIES, BLACKLISTED
+from mypackage.config import *
 
 class MyClient(discord.Client):
 
@@ -36,16 +36,15 @@ class MyClient(discord.Client):
         if msg == '!list':
             embed = discord.Embed(
                 title='Commands Lists',
-                description='''Hello, I\'m the product of your horrible thesis.
-                    Please refer to the commands below on how to use me.\n''',
+                description='''Hello, I\'m the product of your horrible thesis. Please refer to the commands below on how to use me.\n''',
                 color=0xf1c40f)
 
             for command in COMMANDS:
                 embed.add_field(
                     name=command.get('command'),
-                    value=command.get('response'),
-                    inline=False)
-            
+                    value=command.get('response'),)
+
+            embed.set_footer(text='Bot created on July 8, 2022.')
             await message.channel.send(content=None, embed=embed)
 
         # !dad-jokes
@@ -84,6 +83,20 @@ class MyClient(discord.Client):
                 await message.channel.send('*' + response_setup + '*')
                 response_delivery = joke['delivery']
                 await message.channel.send('*||' + response_delivery + '||*')
+
+        # !stats
+        if msg == '!stats':
+            embed = discord.Embed(
+                title='Thesis Bot Stats',
+                color=0xf1c40f)
+
+            for key, value in STATS.items():
+                embed.add_field(
+                    name=key,
+                    value=value)
+
+            await message.channel.send(content=None, embed=embed)
+
 
 
 client = MyClient()
