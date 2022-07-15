@@ -88,8 +88,12 @@ class MyClient(discord.Client):
         if msg == '!stats':
             embed = discord.Embed(
                 title='Thesis Bot Statistics',
-                description='\u1CBC\u1CBC',
+                description='\u1CBC\u1CBC',  # Insert blank space
+                url='https://discord.com/users/816934307780231178',
                 color=0xf1c40f)
+            embed.set_author(
+                name='Thesis Bot',
+                icon_url='https://github.com/Lorddickenstein/FSLRwithNLP/blob/main/Application/Images/logo.png?raw=true')
 
             for key, value in STATS.items():
                 embed.add_field(
