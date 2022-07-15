@@ -36,16 +36,15 @@ class MyClient(discord.Client):
         if msg == '!list':
             embed = discord.Embed(
                 title='Commands Lists',
-                description='These are some helpful commands.',
-                color=0xf1c40f
-            )
+                description='''Hello, I\'m the product of your horrible thesis.
+                    Please refer to the commands below on how to use me.\n'''
+                color=0xf1c40f)
 
             for command in COMMANDS:
                 embed.add_field(
                     name=command.get('command'),
                     value=command.get('response'),
-                    inline=false
-                )
+                    inline=False)
             
             await message.channel.send(content=None, embed=embed)
 
