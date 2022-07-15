@@ -1,6 +1,8 @@
 import discord
 from dadjokes import Dadjoke
 from jokeapi import Jokes
+from datetime import datetime
+from mypackage.database import Database
 from mypackage.config import *
 
 class MyClient(discord.Client):
@@ -21,16 +23,6 @@ class MyClient(discord.Client):
 
         if message.author == self.user:
             return
-
-        # more like Bore Ragnarok!
-        if msg.endswith('? more like') or  msg.endswith('more like'):
-            response = 'Bore Ragnarok'
-            await message.channel.send(response)
-
-        # please don't apologize
-        if any(words in msg for words in SORRY_WORDS):
-            response = 'Stop apologizing so much!!! It\'s CRINGE!!!'
-            await message.channel.send(response)
 
         # !list
         if msg == '!list':
@@ -101,6 +93,48 @@ class MyClient(discord.Client):
                     value=value)
 
             await message.channel.send(content=None, embed=embed)
+
+        # word counter
+        if any(word in msg.split() for word in WORDS_COUNTED):
+            db = Database('discord_db.db')
+            author_id = message.author.id
+
+            embed = discord.Embed(
+                title='Word Counter (Global)',
+                color=0x28b463
+                )
+
+            date_now = datetime.now()
+            datetime_created = date_now.strftime('%Y-%m-%d %H:%M')
+
+            words_list = []
+            for word in msg.split():
+                if word in WORDS_COUNTED:
+                    db.insert_record('word_counter',
+                        author=author_id,
+                        word=word,
+                        datetime_created=datetime_created)
+                    words_list.append(word)
+                    embed.add_field(name=f'{word.capitalize()}', value=f'Has been mentioned by <@{author_id}>', inline=False)
+
+            words_list = set(words_list)
+            for word in words_list:
+                total_mentions = db.count_mentions('word_counter', author=author_id, word=word)
+                embed.add_field(name=f'{word.capitalize()}', value=f'Total mentions: `{total_mentions}`', inline=False)
+
+            embed.add_field(name=f'\u1CBC\u1CBC', value='*Type `$leaderboards` to display leaderboards or `$monitored-words` to display a list of monitored words*')
+            db.close()
+            await message.channel.send(content=None, embed=embed)
+
+        # more like Bore Ragnarok!
+        if msg.endswith('? more like') or  msg.endswith('more like'):
+            response = 'Bore Ragnarok'
+            await message.channel.send(response)
+
+        # please don't apologize
+        if any(words in msg for words in SORRY_WORDS):
+            response = 'Stop apologizing so much!!! It\'s CRINGE!!!'
+            await message.channel.send(response)
 
 
 

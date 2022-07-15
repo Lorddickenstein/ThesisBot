@@ -32,7 +32,7 @@ BLACKLISTED = ['nsfw', 'religious', 'political', 'racist', 'sexist', 'explicit']
 
 CATEGORIES = ['any', 'misc', 'programming', 'dark', 'pun', 'spooky', 'christmas']
 
-WORDS_COUNTED = ['sanaol', 'naol', 'sana all']
+WORDS_COUNTED = ['sanaol', 'naol']
 
 STATS = {
         'Bot Version': '0.1 beta',
