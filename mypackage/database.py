@@ -14,7 +14,7 @@ class Database:
 			author varchar(120) NOT NULL,
 			word varchar(50),
 			datetime_created datetime)'''
-		self.create_table(query)
+		# self.create_table(query)
 
 
 	def create_connection(self):
