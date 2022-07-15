@@ -102,6 +102,36 @@ class MyClient(discord.Client):
 
             await message.channel.send(content=None, embed=embed)
 
+        if any(word in msg for word in words_counted):
+            db = Database('discord_db.db')
+            author_id = message.author.id
+
+            embed = discord.Embed(
+                title='Word Counter',
+                color=0x28b463
+                )
+
+            date_now = datetime.now()
+            datetime_created = date_now.strftime('%Y-%m-%d %H:%M')
+
+            words_list = []
+            for word in msg.split():
+                if word in words_counted:
+                    db.insert_record('word_counter',
+                        author=author_id,
+                        word=word)
+                    words_list.append(word)
+                    embed.add_field(name=f'{word.capitalize()}', value=f'Has been mentioned by <@{author_id}>', inline=False)
+
+            words_list = set(words_list)
+            for word in words_list:
+                total_mentions = db.count_mentions('word_counter', author=author_id, word=word)
+                embed.add_field(name=f'{word.capitalize()}', value=f'Total mentions: `{total_mentions}`', inline=False)
+
+            embed.add_field(name=f'\u1CBC\u1CBC', value='*Type `$leaderboards` to display leaderboards or `$monitored-words` to display a list of monitored words*')
+            db.close()
+            await message.channel.send(content=None, embed=embed)
+
 
 
 client = MyClient()
