@@ -36,7 +36,7 @@ class MyClient(discord.Client):
         if msg == '!list':
             embed = discord.Embed(
                 title='Commands Lists',
-                description='''Hello, I\'m the product of your horrible thesis. Please refer to the commands below on how to use me.\n''',
+                description='''Hello, I\'m the product of your horrible thesis. Please refer to the commands below on how to use me.\n\u1CBC\u1CBC''',
                 color=0xf1c40f)
 
             for command in COMMANDS:
@@ -87,7 +87,8 @@ class MyClient(discord.Client):
         # !stats
         if msg == '!stats':
             embed = discord.Embed(
-                title='Thesis Bot Stats',
+                title='Thesis Bot Statistics',
+                description='\u1CBC\u1CBC',
                 color=0xf1c40f)
 
             for key, value in STATS.items():
