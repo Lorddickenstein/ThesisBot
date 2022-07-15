@@ -37,7 +37,7 @@ class MyClient(discord.Client):
             embed = discord.Embed(
                 title='Commands Lists',
                 description='''Hello, I\'m the product of your horrible thesis.
-                    Please refer to the commands below on how to use me.\n'''
+                    Please refer to the commands below on how to use me.\n''',
                 color=0xf1c40f)
 
             for command in COMMANDS:
