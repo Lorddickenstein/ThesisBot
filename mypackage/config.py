@@ -18,10 +18,17 @@ COMMANDS = [
         {'command': '!jokes-religious', 'response': 'generates a random religious joke'},
         {'command': '!jokes-sexist', 'response': 'generates a random sexist joke'},
         {'command': '!jokes-spooky', 'response': 'generates a random spooky joke'},
+        ]
+
+OTHER_COMMANDS = [
         {'command': 'more like', 'response': 'more like Bore Ragnarok!'},
         {'command': '<literally anything>? more like', 'response': 'more like Bore Ragnarok!'},
-    ]
+        ]
 
 SORRY_WORDS = ['sorry', 'sorre', 'sorreh', 'sorrey', 'sori', '!sorry']
+
 BLACKLISTED = ['nsfw', 'religious', 'political', 'racist', 'sexist', 'explicit']
+
 CATEGORIES = ['any', 'misc', 'programming', 'dark', 'pun', 'spooky', 'christmas']
+
+WORDS_COUNTED = ['sanaol', 'naol']
