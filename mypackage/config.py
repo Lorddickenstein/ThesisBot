@@ -2,7 +2,6 @@ BOT_TOKEN = 'ODE2OTM0MzA3NzgwMjMxMTc4.GgsdKt.Apb_8d89yArsIx2JmstImuYM2jQxKIAPHXW
 
 COMMANDS = [
         {'command': '!list', 'response': 'lists all commands'},
-        {'command': '!sorry', 'response': 'NEVER USE THIS COMMAND. THIS IS FORBIDDEN!!!'},
         {'command': '!dad-jokes', 'response': 'generates a random dad joke'},
         {'command': '!jokes', 'response': 'generates any random joke'},
         {'command': '!jokes-any', 'response': 'generates a random joke'},
@@ -18,6 +17,7 @@ COMMANDS = [
         {'command': '!jokes-religious', 'response': 'generates a random religious joke'},
         {'command': '!jokes-sexist', 'response': 'generates a random sexist joke'},
         {'command': '!jokes-spooky', 'response': 'generates a random spooky joke'},
+        {'command': '!sorry', 'response': 'NEVER USE THIS COMMAND. IT IS FORBIDDEN!!!'},
         ]
 
 OTHER_COMMANDS = [

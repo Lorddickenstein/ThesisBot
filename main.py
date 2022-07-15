@@ -34,21 +34,18 @@ class MyClient(discord.Client):
 
         # !list
         if msg == '!list':
-            # response = '```[Available commands]\n\n'
-            # for command in COMMANDS:
-            #     response += '\t' + command.get('command') + ' - ' + command.get('response') + '\n'
-            # response += '```'
-            # await message.channel.send(response)
             embed = discord.Embed(
                 title='Commands Lists',
                 description='These are some helpful commands.',
                 color=0xf1c40f
             )
-            # embed.add_field(name='!list', value='lists all commands', inline=False)
-            # embed.add_field(name='!jokes', value='generates any random joke', inline=False)
-            # embed.add_field(name='!dad-jokes', value='generates a random dad joke', inline=False)
+
             for command in COMMANDS:
-                embed.add_field(name=command.get('command'), value=command.get('response'))
+                embed.add_field(
+                    name=command.get('command'),
+                    value=command.get('response'),
+                    inline=false
+                )
             
             await message.channel.send(content=None, embed=embed)
 
