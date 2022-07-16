@@ -96,13 +96,12 @@ class MyClient(discord.Client):
 
         # word counter
         if any(word in msg.split() for word in WORDS_COUNTED):
-            db = Database('discord_db.db')
+            db = Database('mypackage\\discord_db.db')
             author_id = message.author.id
 
             embed = discord.Embed(
                 title='Word Counter (Global)',
-                color=0x28b463
-                )
+                color=0x28b463)
 
             date_now = datetime.now()
             datetime_created = date_now.strftime('%Y-%m-%d %H:%M')
@@ -115,14 +114,23 @@ class MyClient(discord.Client):
                         word=word,
                         datetime_created=datetime_created)
                     words_list.append(word)
-                    embed.add_field(name=f'{word.capitalize()}', value=f'Has been mentioned by <@{author_id}>', inline=False)
+                    embed.add_field(
+                        name=f'{word.capitalize()}',
+                        value=f'Has been mentioned by <@{author_id}>',
+                        inline=False)
 
-            words_list = set(words_list)
-            for word in words_list:
+            words_list = dict.fromkeys(words_list)
+            for word, _ in words_list.items():
                 total_mentions = db.count_mentions('word_counter', author=author_id, word=word)
-                embed.add_field(name=f'{word.capitalize()}', value=f'Total mentions: `{total_mentions}`', inline=False)
+                embed.add_field(
+                    name=f'{word.capitalize()}',
+                    value=f'Total mentions: `{total_mentions}`',
+                    inline=False)
 
-            embed.add_field(name=f'\u1CBC\u1CBC', value='*Type `$leaderboards` to display leaderboards or `$monitored-words` to display a list of monitored words*')
+            embed.add_field(
+                name=f'\u1CBC\u1CBC',
+                value='*Type `!leaderboards` to display leaderboards or `!monitored-words` to display a list of monitored words*',
+                inline=False)
             db.close()
             await message.channel.send(content=None, embed=embed)
 

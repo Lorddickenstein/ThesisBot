@@ -92,6 +92,10 @@ class Database:
 			return rows
 
 
+	def get_leaderboards(self):
+		pass
+
+
 	def close(self):
 		""" close the connection """
 
