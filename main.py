@@ -84,7 +84,6 @@ class MyClient(discord.Client):
                 color=0x3498DB)
 
             params = msg.split('-')
-
             if len(params) > 1:
                 _, word = params
                 leaderboards = db.get_leaderboards(word=word)
@@ -102,15 +101,11 @@ class MyClient(discord.Client):
                     value=value,
                     inline=True)
 
-            if len(params) > 1:
-                value = 'Type `$leaderboards` to display all leaderboards.'
-            else:
-                value = 'Type `$leaderboards-[monitored_word]` to display word-specific leaderboard.'
+
             embed.add_field(
                 name='\u1CBC\u1CBC',
-                value=value,
+                value='Type `$leaderboards` to display all leaderboards.' if len(params) > 1 else 'Type `$leaderboards-[monitored_word]` to display word-specific leaderboard.',
                 inline=False)
-
             db.close()
             await message.channel.send(content=None, embed=embed)
 
@@ -126,12 +121,12 @@ class MyClient(discord.Client):
                 total_mentions = db.count_mentions('word_counter',
                     word=word)
                 embed.add_field(
-                    name=f'{word.capitalize()}',
+                    name=word.capitalize(),
                     value=f'Total mentions: `{total_mentions}`',
                     inline=True)
 
             embed.add_field(
-                name=f'\u1CBC\u1CBC',
+                name='\u1CBC\u1CBC',
                 value='Type `!leaderboards` to display all leaderboards.',
                 inline=False)
             db.close()
@@ -176,7 +171,7 @@ class MyClient(discord.Client):
                         datetime_created=datetime_created)
                     words_list.append(word)
                     embed.add_field(
-                        name=f'{word.capitalize()}',
+                        name=word.capitalize(),
                         value=f'Has been mentioned by <@{author_id}>',
                         inline=False)
 
@@ -186,12 +181,12 @@ class MyClient(discord.Client):
                     author=author_id,
                     word=word)
                 embed.add_field(
-                    name=f'{word.capitalize()}',
+                    name=word.capitalize(),
                     value=f'Total mentions: `{total_mentions}`',
                     inline=False)
 
             embed.add_field(
-                name=f'\u1CBC\u1CBC',
+                name='\u1CBC\u1CBC',
                 value='Type `!leaderboards` to display leaderboards or `!monitored-words` to display a list of monitored words.',
                 inline=False)
             db.close()
