@@ -82,7 +82,7 @@ class MyClient(discord.Client):
                 title='Thesis Bot Statistics',
                 description='\u1CBC\u1CBC',  # Insert blank space
                 url='https://discord.com/users/816934307780231178',
-                color=0xf1c40f)
+                color=0x5c64f4)
             embed.set_author(
                 name='Thesis Bot',
                 icon_url='https://github.com/Lorddickenstein/FSLRwithNLP/blob/main/Application/Images/logo.png?raw=true')
