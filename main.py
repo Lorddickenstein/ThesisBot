@@ -76,6 +76,30 @@ class MyClient(discord.Client):
                 response_delivery = joke['delivery']
                 await message.channel.send('*||' + response_delivery + '||*')
 
+        # !monitored-words
+        if msg == '!monitored-words':
+            db = Database('discord_db.db')
+            author_id = message.author.id
+            embed = discord.Embed(
+                title='List of Monitored Words',
+                color=0x5D6D7E)
+
+            for word in words_counted:
+                total_mentions = db.count_mentions('word_counter',
+                    author=author_id,
+                    word=word)
+                embed.add_field(
+                    name=f'{word.capitalize()}',
+                    value=f'Total mentions: `{total_mentions}`',
+                    inline=True)
+
+            embed.add_field(
+                name=f'\u1CBC\u1CBC',
+                value='Type `!leaderboards` to display all leaderboards.',
+                inline=False)
+            db.close()
+            await message.channel.send(content=None, embed=embed)
+
         # !stats
         if msg == '!stats':
             embed = discord.Embed(
@@ -121,7 +145,9 @@ class MyClient(discord.Client):
 
             words_list = dict.fromkeys(words_list)
             for word, _ in words_list.items():
-                total_mentions = db.count_mentions('word_counter', author=author_id, word=word)
+                total_mentions = db.count_mentions('word_counter',
+                    author=author_id,
+                    word=word)
                 embed.add_field(
                     name=f'{word.capitalize()}',
                     value=f'Total mentions: `{total_mentions}`',
@@ -129,7 +155,7 @@ class MyClient(discord.Client):
 
             embed.add_field(
                 name=f'\u1CBC\u1CBC',
-                value='*Type `!leaderboards` to display leaderboards or `!monitored-words` to display a list of monitored words*',
+                value='Type `!leaderboards` to display leaderboards or `!monitored-words` to display a list of monitored words.',
                 inline=False)
             db.close()
             await message.channel.send(content=None, embed=embed)
@@ -143,7 +169,6 @@ class MyClient(discord.Client):
         if any(words in msg for words in SORRY_WORDS):
             response = 'Stop apologizing so much!!! It\'s CRINGE!!!'
             await message.channel.send(response)
-
 
 
 client = MyClient()
