@@ -82,7 +82,7 @@ class MyClient(discord.Client):
             author_id = message.author.id
             embed = discord.Embed(
                 title='List of Monitored Words',
-                color=0x5D6D7E)
+                color=0x566573)
 
             for word in WORDS_COUNTED:
                 total_mentions = db.count_mentions('word_counter',
@@ -120,7 +120,7 @@ class MyClient(discord.Client):
 
         # word counter
         if any(word in msg.split() for word in WORDS_COUNTED):
-            db = Database('DB_FILE')
+            db = Database(DB_FILE)
             author_id = message.author.id
 
             embed = discord.Embed(
