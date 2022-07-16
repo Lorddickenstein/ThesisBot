@@ -17,6 +17,7 @@ COMMANDS = [
         {'command': '!jokes-sexist', 'response': 'Generate a random sexist joke'},
         {'command': '!jokes-spooky', 'response': 'Generate a random spooky joke'},
         {'command': '!leaderboards', 'response': 'Display top mentions of watchlisted words'},
+        {'command': '!leaderboards-[monitored_words]', 'response': 'Display top mentions of a specific watchlisted word'},
         {'command': '!monitored-words', 'response': 'List all monitored words'},
         {'command': '!sorry', 'response': 'I hate this command. Please never use it.'},
         {'command': '!stats', 'response': 'Display bot statistics'},
