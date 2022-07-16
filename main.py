@@ -76,6 +76,44 @@ class MyClient(discord.Client):
                 response_delivery = joke['delivery']
                 await message.channel.send('*||' + response_delivery + '||*')
 
+        # !leaderboards
+        if msg.startswith('!leaderboards'):
+            db = Database(DB_FILE)
+            embed = discord.Embed(
+                title='Leaderboards',
+                color=0x3498DB)
+
+            params = msg.split('-')
+
+            if len(params) > 1:
+                _, word = params
+                leaderboards = db.get_leaderboards(word=word)
+            else:
+                leaderboards = db.get_leaderboards()
+
+            for word, results in leaderboards.items():
+                value = ''
+                for result in results:
+                    member = await message.guild.fetch_member(int(result['author']))
+                    value += f'{member.name}#{member.discriminator} : `{result["count"]}`\n'
+                
+                embed.add_field(
+                    name=word.capitalize(),
+                    value=value,
+                    inline=True)
+
+            if len(params) > 1:
+                value = 'Type `$leaderboards` to display all leaderboards.'
+            else:
+                value = 'Type `$leaderboards-[monitored_word]` to display word-specific leaderboard.'
+            embed.add_field(
+                name='\u1CBC\u1CBC',
+                value=value,
+                inline=False)
+
+            db.close()
+            await message.channel.send(content=None, embed=embed)
+
         # !monitored-words
         if msg == '!monitored-words':
             db = Database(DB_FILE)
@@ -103,12 +141,12 @@ class MyClient(discord.Client):
         if msg == '!stats':
             embed = discord.Embed(
                 title='Thesis Bot Statistics',
-                description='\u1CBC\u1CBC',  # Insert blank space
+                description='\u1CBC\u1CBC',
                 url='https://discord.com/users/816934307780231178',
                 color=0x5c64f4)
             embed.set_author(
                 name='Thesis Bot',
-                icon_url='https://github.com/Lorddickenstein/FSLRwithNLP/blob/main/Application/Images/logo.png?raw=true')
+                icon_url=client.user.avatar_url)
 
             for key, value in STATS.items():
                 embed.add_field(
