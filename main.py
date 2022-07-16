@@ -84,7 +84,7 @@ class MyClient(discord.Client):
                 title='List of Monitored Words',
                 color=0x5D6D7E)
 
-            for word in words_counted:
+            for word in WORDS_COUNTED:
                 total_mentions = db.count_mentions('word_counter',
                     author=author_id,
                     word=word)
