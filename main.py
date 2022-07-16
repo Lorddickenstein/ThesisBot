@@ -78,7 +78,7 @@ class MyClient(discord.Client):
 
         # !monitored-words
         if msg == '!monitored-words':
-            db = Database('discord_db.db')
+            db = Database(DB_FILE)
             author_id = message.author.id
             embed = discord.Embed(
                 title='List of Monitored Words',
@@ -120,7 +120,7 @@ class MyClient(discord.Client):
 
         # word counter
         if any(word in msg.split() for word in WORDS_COUNTED):
-            db = Database('mypackage/discord_db.db')
+            db = Database('DB_FILE')
             author_id = message.author.id
 
             embed = discord.Embed(

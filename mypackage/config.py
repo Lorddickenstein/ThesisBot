@@ -44,3 +44,5 @@ STATS = {
         'Bot Developers': '<@756084838154633237>',
         'Bot Created': 'July 8, 2022',
 }
+
+DB_FILE = 'mypackage/discord_db.db'
