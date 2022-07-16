@@ -86,7 +86,6 @@ class MyClient(discord.Client):
 
             for word in WORDS_COUNTED:
                 total_mentions = db.count_mentions('word_counter',
-                    author=author_id,
                     word=word)
                 embed.add_field(
                     name=f'{word.capitalize()}',
