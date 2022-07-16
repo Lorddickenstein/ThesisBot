@@ -96,7 +96,7 @@ class MyClient(discord.Client):
 
         # word counter
         if any(word in msg.split() for word in WORDS_COUNTED):
-            db = Database('mypackage\\discord_db.db')
+            db = Database('mypackage/discord_db.db')
             author_id = message.author.id
 
             embed = discord.Embed(
