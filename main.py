@@ -81,7 +81,7 @@ class MyClient(discord.Client):
             db = Database(DB_FILE)
             embed = discord.Embed(
                 title='Leaderboards',
-                color=0x3498DB)
+                color=0x5865f2)
 
             params = msg.split('-')
             if len(params) > 1:
@@ -115,7 +115,7 @@ class MyClient(discord.Client):
             author_id = message.author.id
             embed = discord.Embed(
                 title='List of Monitored Words',
-                color=0x566573)
+                color=0x5c64f4)
 
             for word in WORDS_COUNTED:
                 total_mentions = db.count_mentions('word_counter',
@@ -138,7 +138,8 @@ class MyClient(discord.Client):
                 title='Thesis Bot Statistics',
                 description='\u1CBC\u1CBC',
                 url='https://discord.com/users/816934307780231178',
-                color=0x5c64f4)
+                color=0x00aff4)
+            
             embed.set_author(
                 name='Thesis Bot',
                 icon_url=client.user.avatar_url)
