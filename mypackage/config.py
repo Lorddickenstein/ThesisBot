@@ -1,4 +1,4 @@
-BOT_TOKEN = 'ODE2OTM0MzA3NzgwMjMxMTc4.GgsdKt.Apb_8d89yArsIx2JmstImuYM2jQxKIAPHXWMug'
+BOT_TOKEN = 'ODE2OTM0MzA3NzgwMjMxMTc4.GmkWde.XkORDRxu5gKAcayWcWKz70EMfDhm1-TrE5g13g'
 
 COMMANDS = [
         {'command': '!list', 'response': 'Lists all commands'},
