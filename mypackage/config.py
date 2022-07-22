@@ -1,5 +1,3 @@
-BOT_TOKEN = 'ODE2OTM0MzA3NzgwMjMxMTc4.GmkWde.XkORDRxu5gKAcayWcWKz70EMfDhm1-TrE5g13g'
-
 COMMANDS = [
         {'command': '!list', 'response': 'Lists all commands'},
         {'command': '!dad-jokes', 'response': 'Generate a random dad joke'},

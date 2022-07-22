@@ -1,9 +1,13 @@
 import discord
 from dadjokes import Dadjoke
-from jokeapi import Jokes
 from datetime import datetime
-from mypackage.database import Database
+from dotenv import load_dotenv
+from jokeapi import Jokes
 from mypackage.config import *
+from mypackage.database import Database
+
+load_dotenv()
+token = os.getenv('BOT_TOKEN')
 
 class MyClient(discord.Client):
 
@@ -205,4 +209,4 @@ class MyClient(discord.Client):
 
 
 client = MyClient()
-client.run(BOT_TOKEN)
+client.run(token)
