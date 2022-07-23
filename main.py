@@ -3,10 +3,8 @@ from botconfigs.config import *
 from botconfigs.database import Database
 from dadjokes import Dadjoke
 from datetime import datetime
-# from dotenv import load_dotenv
 from jokeapi import Jokes
 
-# load_dotenv()
 token = os.getenv('BOT_TOKEN')
 
 class MyClient(discord.Client):
