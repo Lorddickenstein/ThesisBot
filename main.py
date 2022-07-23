@@ -1,11 +1,12 @@
 import discord
+import os
 from botconfigs.config import *
 from botconfigs.database import Database
 from dadjokes import Dadjoke
 from datetime import datetime
 from jokeapi import Jokes
 
-token = os.environ.get('BOT_TOKEN')
+token = os.getenv('BOT_TOKEN')
 
 class MyClient(discord.Client):
 
