@@ -5,7 +5,7 @@ from dadjokes import Dadjoke
 from datetime import datetime
 from jokeapi import Jokes
 
-token = os.getenv('BOT_TOKEN')
+token = os.environ.get('BOT_TOKEN')
 
 class MyClient(discord.Client):
 
