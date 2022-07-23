@@ -9,6 +9,7 @@ discord.py==1.7.3
 idna==3.3
 jokeapi==1.0.5
 multidict==6.0.2
+python-dotenv==0.20.0
 requests==2.28.1
 simplejson==3.17.6
 typing-extensions==4.3.0
