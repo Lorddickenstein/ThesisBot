@@ -6,8 +6,8 @@ from jokeapi import Jokes
 from mypackage.config import *
 from mypackage.database import Database
 
-# load_dotenv()
-# token = os.getenv('BOT_TOKEN')
+load_dotenv()
+token = os.getenv('BOT_TOKEN')
 
 class MyClient(discord.Client):
 
