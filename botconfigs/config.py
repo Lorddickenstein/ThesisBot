@@ -44,4 +44,4 @@ STATS = {
         'Bot Created': 'July 8, 2022',
 }
 
-DB_FILE = 'mypackage/discord_db.db'
+DB_FILE = 'botconfigs/discord_db.db'
