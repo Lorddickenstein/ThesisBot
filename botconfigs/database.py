@@ -5,41 +5,19 @@ class Database:
 
 	def __init__(self, db_name):
 		self.db_name = db_name
-		self.conn = self.create_connection()
+
+
+	def __enter__(self):
+		print(f'  Connecting to {self.db_name} database v.{sqlite3.version}...')
+		self.conn = sqlite3.connect(self.db_name)
 		self.conn.row_factory = sqlite3.Row
 		self.cur = self.conn.cursor()
-
-		query = '''CREATE TABLE word_counter (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			author varchar(120) NOT NULL,
-			word varchar(50),
-			datetime_created datetime)'''
-		# self.create_table(query)
+		print('  Connection established...')
+		return self
 
 
-	def create_connection(self):
-		""" create a database connection to a SQLite Database """
-
-		conn = None
-		try:
-			print(f'   Connecting to {self.db_name} database v.{sqlite3.version}...')
-			conn = sqlite3.connect(self.db_name)
-			print('   Connection established.')
-		except Error as err:
-			print(err)
-			return
-
-		return conn
-
-
-	def create_table(self, query):
-		""" create a table in the database connection """
-
-		try:
-			print('   Creating Table...')
-			self.conn.execute(query)
-		except Error as err:
-			print('   Table is already created.')
+	def __exit__(self, type, value, tb):
+		self.conn.close()
 
 
 	def insert_record(self, table_name, **args):
@@ -61,14 +39,14 @@ class Database:
 		query = query[:-1] + ')'
 		# print(query)
 
-		print(f'   Inserting record to {table_name}...')
+		print(f'  Inserting record to {table_name}...')
 		try:
 			self.cur.execute(query)
 			self.conn.commit()
-			print('   Inserting record successful.')
+			print('  Inserting record successful.')
 		except Error as err:
 			self.conn.rollback()
-			print('   Inserting unsuccessful.', err)
+			print('  Inserting unsuccessful.', err)
 
 
 	def count_mentions(self, table_name, **args):
@@ -88,12 +66,23 @@ class Database:
 		query = query[:-1]
 
 		# print(query)
+		print('  Executing query for counting total mentions...')
 		rows = self.cur.execute(query).fetchall()
 		if len(rows) == 1:
 			key = rows[0].keys()[0]
 			return rows[0][key]
 		else:
 			return rows
+
+
+	def get_all_words(self):
+		""" return a list of all monitored words """
+
+		query = 'SELECT DISTINCT word FROM monitored_words'
+		print('  Executing query for getting all monitored words...')
+		rows = self.cur.execute(query).fetchall()
+		words_list = [row['word'] for row in rows]
+		return words_list
 
 
 	def get_leaderboards(self, word=None, limit=5):
@@ -116,6 +105,7 @@ class Database:
 		leaderboards = {}
 		'''
 		sample data:
+		
 			leaderboards = {
 				'sanaol': [
 					{'count': 15, 'author': '756084838154633237'},
@@ -131,16 +121,17 @@ class Database:
 		'''
 
 		if word:
+			print(f'  Executing query for getting {word} leaderboards...')
 			rows = get_rows(word, limit)
 			leaderboards[word] = [{'count': row[0], 'author': row[1]} for row in rows]
 		else:
-			query = 'SELECT DISTINCT word FROM monitored_words'
-			rows = self.cur.execute(query).fetchall()
-			words_list = [row['word'] for row in rows]
+			print('  Executing query for getting all leaderboards...')
+			words_list = self.get_all_words()
 
 			for word in words_list:
 				rows = get_rows(word, limit)
 				leaderboards[word] = [{'count': row[0], 'author': row[1]} for row in rows]
+			print('  Learderboards loaded successfully...')
 				
 		return leaderboards
 
@@ -150,6 +141,4 @@ class Database:
 
 		if self.conn:
 			self.conn.close()
-			return 1
-
-		return -1
+			return

@@ -1,174 +1,75 @@
 import discord
+import logging
 import os
 from botconfigs.config import *
 from botconfigs.database import Database
 from dadjokes import Dadjoke
 from datetime import datetime
+from discord.ext import commands
 from jokeapi import Jokes
 
 token = os.getenv('BOT_TOKEN')
+prefix = '!'
+intents = discord.Intents.default()
+client = commands.Bot(command_prefix=prefix, intents=intents)
+client.remove_command('help')
 
-class MyClient(discord.Client):
-
-    async def on_ready(self):
-        print('Logged on as {0}!'.format(self.user))
-
-    async def on_message(self, message):
-        print('Message from {0.author}: {0.content}'.format(message))
-
-        def find_specific_joke(jokes, category):
-            for joke in jokes['jokes']:
-                if joke['flags'][category]:
-                    return joke
-            return
-
-        msg = message.content.lower()
-
-        if message.author == self.user:
-            return
-
-        # !list
-        if msg == '!list':
-            embed = discord.Embed(
-                title='Commands Lists',
-                description='''Hello, I\'m the product of your horrible thesis. Please refer to the commands below on how to use me.\n\u1CBC\u1CBC''',
-                color=0xf1c40f)
-
-            for command in COMMANDS:
-                embed.add_field(
-                    name=command.get('command'),
-                    value=command.get('response'),)
-
-            embed.set_footer(text='Bot created on July 8, 2022.')
-            await message.channel.send(content=None, embed=embed)
-
-        # !dad-jokes
-        if msg == '!dad-jokes':
-            dadjoke = Dadjoke()
-            response = dadjoke.joke
-            await message.channel.send('*' + response + '*')
-
-        # !jokes
-        if msg.startswith('!jokes'):
-            j = await Jokes()
-            params = msg.split('-')
-
-            # !jokes with categories
-            if len(params) > 1:
-                _, category = params
-                if category in BLACKLISTED:
-                    while True:
-                        jokes = await j.get_joke(amount=10)
-                        joke = find_specific_joke(jokes, category)
-                        if joke:
-                            break
-                        
-                elif category in CATEGORIES:
-                    joke = await j.get_joke(category=[category])
-
-            # !jokes with no categories
-            else:
-                joke = await j.get_joke()
-
-            if joke['type'] == 'single':
-                response = joke['joke']
-                await message.channel.send(response)
-            else:
-                response_setup = joke['setup']
-                await message.channel.send('*' + response_setup + '*')
-                response_delivery = joke['delivery']
-                await message.channel.send('*||' + response_delivery + '||*')
-
-        # !leaderboards
-        if msg.startswith('!leaderboards'):
-            db = Database(DB_FILE)
-            embed = discord.Embed(
-                title='Leaderboards',
-                color=0x5865f2)
-
-            params = msg.split('-')
-            if len(params) > 1:
-                _, word = params
-                leaderboards = db.get_leaderboards(word=word)
-            else:
-                leaderboards = db.get_leaderboards()
-
-            for word, results in leaderboards.items():
-                value = ''
-                for result in results:
-                    member = await message.guild.fetch_member(int(result['author']))
-                    value += f'{member.name}#{member.discriminator} : `{result["count"]}`\n'
-                
-                embed.add_field(
-                    name=word.capitalize(),
-                    value=value,
-                    inline=True)
+# Discord Logs
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 
-            embed.add_field(
-                name='\u1CBC\u1CBC',
-                value='Type `$leaderboards` to display all leaderboards.' if len(params) > 1 else 'Type `$leaderboards-[monitored_word]` to display word-specific leaderboard.',
-                inline=False)
-            db.close()
-            await message.channel.send(content=None, embed=embed)
+@client.event
+async def on_ready():
+    print('Logged on as {0}!'.format(client.user))
 
-        # !monitored-words
-        if msg == '!monitored-words':
-            db = Database(DB_FILE)
-            author_id = message.author.id
-            embed = discord.Embed(
-                title='List of Monitored Words',
-                color=0x5c64f4)
+    print('  Initializing global variables...')
+    global WORDS_COUNTED
+    with Database(DB_FILE) as db:
+        WORDS_COUNTED = db.get_all_words()
 
-            for word in WORDS_COUNTED:
-                total_mentions = db.count_mentions('word_counter',
-                    word=word)
-                embed.add_field(
-                    name=word.capitalize(),
-                    value=f'Total mentions: `{total_mentions}`',
-                    inline=True)
+    await client.change_presence(activity=discord.Game(name="your mom"))
 
-            embed.add_field(
-                name='\u1CBC\u1CBC',
-                value='Type `!leaderboards` to display all leaderboards.',
-                inline=False)
-            db.close()
-            await message.channel.send(content=None, embed=embed)
 
-        # !stats
-        if msg == '!stats':
-            embed = discord.Embed(
-                title='Thesis Bot Statistics',
-                description='\u1CBC\u1CBC',
-                url='https://discord.com/users/816934307780231178',
-                color=0x00aff4)
-            
-            embed.set_author(
-                name='Thesis Bot',
-                icon_url=client.user.avatar_url)
+@client.event
+async def on_message(message):
+    print('Message from {0.author}: {0.content}'.format(message))
 
-            for key, value in STATS.items():
-                embed.add_field(
-                    name=key,
-                    value=value)
+    # ignore bot messages including self
+    if message.author == client.user or message.author.bot:
+        return
 
-            await message.channel.send(content=None, embed=embed)
+    msg = message.content.lower()
+    author = message.author
+    author_id = message.author.id
 
-        # word counter
-        if any(word in msg.split() for word in WORDS_COUNTED):
-            db = Database(DB_FILE)
-            author_id = message.author.id
+    # more like Bore Ragnarok! (callmekevin references - ignore this)
+    if msg.endswith('more like'):
+        response = 'Bore Ragnarok!'
+        await message.channel.send(response)
 
-            embed = discord.Embed(
-                title='Word Counter (Global)',
-                color=0x28b463)
+    # apologetic people amirite? (thesis groupmates reference - also ignore this)
+    elif any(words in msg for words in SORRY_WORDS):
+        response = 'Stop apologizing so much!!! It\'s **CRINGE!!!**'
+        await message.channel.send(response)
 
-            date_now = datetime.now()
-            datetime_created = date_now.strftime('%Y-%m-%d %H:%M')
+    # word counter
+    elif any(word in msg.split() for word in WORDS_COUNTED) and not msg.startswith(prefix):
+        embed = discord.Embed(
+            title='Word Counter (Global)',
+            color=0x28b463)
+        date_now = datetime.now()
+        datetime_created = date_now.strftime('%Y-%m-%d %H:%M')
 
+        with Database(DB_FILE) as db:
+            # insert all mentions of monitored words
             words_list = []
             for word in msg.split():
                 if word in WORDS_COUNTED:
+                    print(f'  {word} has been mentioned by {author}. Inserting to database...')
                     db.insert_record('word_counter',
                         author=author_id,
                         word=word,
@@ -179,7 +80,9 @@ class MyClient(discord.Client):
                         value=f'Has been mentioned by <@{author_id}>',
                         inline=False)
 
+            # count total mentions of monitored words
             words_list = dict.fromkeys(words_list)
+            print(f'  Calculating total mentions of monitored words by {author}')
             for word, _ in words_list.items():
                 total_mentions = db.count_mentions('word_counter',
                     author=author_id,
@@ -191,21 +94,216 @@ class MyClient(discord.Client):
 
             embed.add_field(
                 name='\u1CBC\u1CBC',
-                value='Type `!leaderboards` to display leaderboards or `!monitored-words` to display a list of monitored words.',
+                value=f'Type `{prefix}leaderboards` to display leaderboards or `{prefix}monitored words` to display a list of monitored words.',
                 inline=False)
-            db.close()
-            await message.channel.send(content=None, embed=embed)
 
-        # more like Bore Ragnarok!
-        if msg.endswith('? more like') or  msg.endswith('more like'):
-            response = 'Bore Ragnarok'
-            await message.channel.send(response)
+        await message.channel.send(content=None, embed=embed)
 
-        # please don't apologize
-        if any(words in msg for words in SORRY_WORDS):
-            response = 'Stop apologizing so much!!! It\'s CRINGE!!!'
-            await message.channel.send(response)
+    '''Why does on_message make my commands stop working?
+    Overriding the default provided on_message forbids any extra commands from running. 
+    To fix this, add a bot.process_commands(message) line at the end of your on_message. 
+    For example:
+
+    @bot.event
+    async def on_message(message):
+        # do some extra stuff here
+
+        await bot.process_commands(message)'''
+    await client.process_commands(message)
 
 
-client = MyClient()
+@client.command()
+async def test(ctx, *, arg):
+    if arg == 'help':
+        print('ahh')
+    else:
+        print(arg)
+    # WORDS_COUNTED.append(arg)
+    # print(WORDS_COUNTED)
+    await ctx.send('hello')
+
+
+@client.command()
+async def commands(ctx):
+    embed = discord.Embed(
+        title='Commands Lists',
+        description='Hello, I\'m the product of your horrible thesis. Please refer to the commands below on how to use me.\n\u1CBC\u1CBC',
+        color=0xf1c40f)
+
+    print('  Showing commands list...')
+    for command in COMMANDS:
+        embed.add_field(
+            name=prefix + command.get('command'),
+            value=command.get('response'),
+            inline=True)
+
+    embed.set_footer(text='Bot created on July 8, 2022.')
+    await ctx.send(content=None, embed=embed)
+
+
+@client.command()
+async def dadjokes(ctx):
+    dadjoke = Dadjoke()
+    response = '*' + dadjoke.joke + '*'
+    await ctx.send(response)
+
+
+@client.command()
+async def jokes(ctx, *args):
+
+    def find_specific_joke(jokes, category):
+        for joke in jokes['jokes']:
+            if joke['flags'][category]:
+                return joke
+        return
+
+    # Invalid input
+    if len(args) > 1:
+        response = f'Sorry, your command is invalid. Try `{prefix}commands` for a complete list of valid commands.'
+        await ctx.send(response)
+        return
+
+    category = args[0] if args else None
+
+    print('  Retrieving jokes...')
+    j = await Jokes()
+    joke = None
+
+    # jokes with category
+    if category:
+        print(f'  Searching for {category} jokes...')
+        if category in BLACKLISTED:
+            jokes = await j.get_joke(amount=10)
+            while True:
+                joke = find_specific_joke(jokes, category)
+                if joke:
+                    break
+        elif category in CATEGORIES:
+            joke = await j.get_joke(category=[category])
+        else:
+            print(f'  No such joke with {category} category...')
+            response = f'Sorry, there is no such category for `{category}` jokes in my database.'
+            await ctx.send(response)
+
+    # jokes without categories
+    else:
+        joke = await j.get_joke()
+
+    if joke:
+        print(f'  Joke found with category: {joke["category"]}, flags: {joke["flags"]}...')
+
+        # one-liner jokes
+        if joke['type'] == 'single':
+            response = joke['joke']
+            await ctx.send(response)
+
+        # jokes with setup and delivery
+        else:
+            response = '*' + joke['setup'] + '*'
+            await ctx.send(response)
+            response = '*||' + joke['delivery'] + '||*'
+            await ctx.send(response)
+
+        print('  Joke delivered successfully...')
+
+
+@client.command()
+async def leaderboards(ctx, *args):
+    word = args[0] if args else None
+
+    # Invalid input
+    if len(args) > 1:
+        print(f'  Invalid commands for {prefix}leaderboards {args}...')
+        response = f'Sorry, your command is invalid. Try `{prefix}commands` for a complete list of valid commands.'
+        await ctx.send(response)
+        return
+    elif word and word not in WORDS_COUNTED:
+        print(f'  Invalid commands for {prefix}leaderboards {args}...')
+        response = f'The word `{word}` is currently not being monitored. Use `{prefix}monitored_words` to display a list of monitored words.'
+        await ctx.send(response)
+        return
+
+    embed = discord.Embed(
+        title='Leaderboards',
+        color=0x5865f2)
+
+    with Database(DB_FILE) as db:
+        # leaderboards with specified word
+        if word:
+            leaderboards = db.get_leaderboards(word=word)
+            print('  Showing leaderboards for {word}...')
+        # leaderboards
+        else:
+            leaderboards = db.get_leaderboards()
+            print(f'  Showing leaderboards...')
+        for word, results in leaderboards.items():
+            value = ''
+            for result in results:
+                member = await ctx.guild.fetch_member(
+                    int(result['author']))
+                value += f'{member.name}#{member.discriminator} : `{result["count"]}`\n'
+
+            embed.add_field(
+                name=word.capitalize(),
+                value=value,
+                inline=True)
+
+    value = f'Type `{prefix}leaderboards` to display all leaderboards.' if args else f'Type `{prefix}leaderboards <monitored_word>` to display word-specific leaderboard.'
+    embed.add_field(
+        name='\u1CBC\u1CBC',
+        value=value,
+        inline=False)
+    await ctx.send(content=None, embed=embed)
+
+
+@client.group()
+async def monitored(ctx):
+    if ctx.invoked_subcommand is None:
+        response = f'Sorry, your command is insufficient. Try `{prefix}commands` for a complete list of valid commands.'
+        await ctx.send('response')
+
+@monitored.command()
+async def words(ctx):
+    embed = discord.Embed(
+            title='List of Monitored Words',
+            color=0x5c64f4)
+
+    with Database(DB_FILE) as db:
+        print(f'  Calculating total mentions...')
+        print(f'  Showing monitored words...')
+        # count total mentions of each monitored word
+        for word in WORDS_COUNTED:
+            total_mentions = db.count_mentions('word_counter',
+                word=word)
+            embed.add_field(
+                name=word.capitalize(),
+                value=f'Total mentions: `{total_mentions}`',
+                inline=True)
+        embed.add_field(
+            name='\u1CBC\u1CBC',
+            value=f'Type `{prefix}leaderboards` to display all leaderboards.',
+            inline=False)
+
+    await ctx.send(content=None, embed=embed)
+
+
+@client.command()
+async def stats(ctx):
+    embed = discord.Embed(
+        title='Thesis Bot Statistics',
+        description='\u1CBC\u1CBC',
+        url=f'https://discord.com/users/{ctx.author.id}',
+        color=0x00aff4)
+    embed.set_author(
+        name='Thesis Bot',
+        icon_url=client.user.avatar_url)
+
+    print('  Showing bot statistics...')
+    for key, value in STATS.items():
+        embed.add_field(
+            name=key,
+            value=value)
+    await ctx.send(content=None, embed=embed)
+
+
 client.run(token)
