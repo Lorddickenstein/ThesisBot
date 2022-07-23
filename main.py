@@ -1,10 +1,10 @@
 import discord
+from botconfigs.config import *
+from botconfigs.database import Database
 from dadjokes import Dadjoke
 from datetime import datetime
 # from dotenv import load_dotenv
 from jokeapi import Jokes
-from mypackage.config import *
-from mypackage.database import Database
 
 # load_dotenv()
 token = os.getenv('BOT_TOKEN')
