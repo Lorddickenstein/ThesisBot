@@ -47,10 +47,10 @@ STATS = {
         'Total Users': '*Not yet coded*',
         'Total Guilds': '*Not yet coded*',
         'Bot Developers': [
-                {'name': 'Jerson', 'discordId':'<@756084838154633237>'},
-                {'name': 'King', 'discordId': '<@645255797340766218>'},
-                {'name': 'Ramil', 'discordId': '<@460745694794481666>'},
-                ],
+                {'name': 'Jerson', 'discordId':'756084838154633237'},
+                {'name': 'King', 'discordId': '645255797340766218'},
+                {'name': 'Ramil', 'discordId': '460745694794481666>'},
+        ],
         'Bot Created': 'July 8, 2022',
 }
 
