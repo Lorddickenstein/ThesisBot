@@ -65,7 +65,6 @@ async def on_message(message):
         response = 'Stop apologizing so much!!! It\'s **CRINGE!!!**'
         await message.channel.send(response)
 
-    # TODO: Add "Nice" to list of monitored words
     # word counter
     elif any(word in msg.split() for word in WORDS_COUNTED) and not msg.startswith(prefix):
         embed = discord.Embed(
@@ -428,6 +427,8 @@ async def stats(ctx):
 
     print('  Showing bot statistics...')
     for key, value in STATS.items():
+        if key == 'Bot Developers':
+            value = '\n'.join(value)
         embed.add_field(
             name=key,
             value=value)
