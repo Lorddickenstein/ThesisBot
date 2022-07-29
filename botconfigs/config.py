@@ -57,6 +57,10 @@ STATS = {
 # Database
 DB_FILE = str(BASE_DIR / 'botconfigs' / 'discord_db.db')
 
+BOT_RESTRICTIONS = {
+        'allowed-channels': ['bot-commands'],
+}
+
 if __name__ == '__main__':
         print('Directories: ')
         print('database:', DB_FILE)

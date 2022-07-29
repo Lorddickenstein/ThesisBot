@@ -374,7 +374,6 @@ async def leaderboards(ctx, *args):
     await ctx.send(content=None, embed=embed)
 
 
-# FIXME: This cmd is lame af with its yee yee ass empty functionality
 @client.group()
 async def monitored(ctx):
     if ctx.invoked_subcommand is None:
