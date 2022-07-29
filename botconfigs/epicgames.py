@@ -88,8 +88,8 @@ class EpicGames:
 						'title': game['title'],
 						'description': game['description'],
 						'src':  img_src,
-						'startDate': startDate.strftime('%m-%d-%Y %I:%M %p'),
-						'endDate': endDate.strftime('%m-%d-%Y %I:%M %p'),
+						'startDate': startDate.strftime('%b %d, %Y'),
+						'endDate': endDate.strftime('%b %d, %Y %I:%M %p'),
 						'url': url,
 					})
 
@@ -103,8 +103,8 @@ class EpicGames:
 						'title': game['title'],
 						'description': game['description'],
 						'src':  img_src,
-						'startDate': startDate.strftime('%m-%d-%Y %I:%M %p'),
-						'endDate': endDate.strftime('%m-%d-%Y %I:%M %p'),
+						'startDate': startDate.strftime('%b %d, %Y'),
+						'endDate': endDate.strftime('%b %d, %Y %I:%M %p'),
 						'url': url,
 					})
 		print('    Games initialized...')
