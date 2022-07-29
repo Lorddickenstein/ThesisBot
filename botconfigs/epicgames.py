@@ -19,19 +19,19 @@ class EpicGames:
 
 		url = f'''https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?=locale={self.locale}&country={self.country}&allowCountries={allow_countries}'''
 
-		print(f'  Fetching data from {url}...')
+		print(f'    Fetching data from {url}...')
 		html = self.session.get(url)
 		if html:
-			print(f'  Data received...')
+			print(f'    Data received...')
 			data = json.loads(html.text)
 			return data
 
-		print('  Data not recieved...')
+		print('    Data not recieved...')
 		return
 
 
 	def init(self):
-		print('  Initializing games...')
+		print('    Initializing games...')
 		result = self.fetch()
 
 		now = datetime.now()
@@ -88,8 +88,8 @@ class EpicGames:
 						'title': game['title'],
 						'description': game['description'],
 						'src':  img_src,
-						'startDate': startDate.strftime('%m-%d-%Y %H:%M:%S'),
-						'endDate': endDate.strftime('%m-%d-%Y %H:%M:%S'),
+						'startDate': startDate.strftime('%m-%d-%Y %I:%M %p'),
+						'endDate': endDate.strftime('%m-%d-%Y %I:%M %p'),
 						'url': url,
 					})
 
@@ -103,10 +103,13 @@ class EpicGames:
 						'title': game['title'],
 						'description': game['description'],
 						'src':  img_src,
-						'startDate': startDate.strftime('%m-%d-%Y %H:%M:%S'),
-						'endDate': endDate.strftime('%m-%d-%Y %H:%M:%S'),
+						'startDate': startDate.strftime('%m-%d-%Y %I:%M %p'),
+						'endDate': endDate.strftime('%m-%d-%Y %I:%M %p'),
 						'url': url,
 					})
+		print('    Games initialized...')
+		print(f'    Found {len(self.current_free_games)} current free games...')
+		print(f'    Found {len(self.next_free_games)} next free games...')
 
 	def get_current_free_games(self):
 		return self.current_free_games
