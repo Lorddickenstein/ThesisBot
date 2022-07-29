@@ -1,4 +1,8 @@
 import sys
+from pathlib import Path
+
+# set up base directory relative to main.py
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 COMMANDS = [
         {'command': 'commands', 'response': 'Lists all commands'},
@@ -44,4 +48,10 @@ STATS = {
         'Bot Created': 'July 8, 2022',
 }
 
-DB_FILE = 'botconfigs/discord_db.db'
+# Database
+DB_FILE = str(BASE_DIR / 'botconfigs' / 'discord_db.db')
+
+if __name__ == '__main__':
+        print('Directories: ')
+        print('database:', DB_FILE)
+        print('root application:', BASE_DIR)
