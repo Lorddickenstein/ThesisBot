@@ -33,7 +33,7 @@ async def on_ready():
     global WORDS_COUNTED
     with Database(DB_FILE) as db:
         WORDS_COUNTED = db.get_all_words()
-    print('  Global variables initialized. Awaiting commands...')
+    print('  Global variables initialized...\n  Awaiting commands...')
 
     await client.change_presence(activity=discord.Game(name="your mom"))
 
@@ -126,11 +126,12 @@ async def on_message(message):
 
 
 @client.command()
-async def test(ctx, *, arg):
-    if arg == 'help':
-        print('ahh')
-    else:
-        print(arg)
+async def test(ctx, arg):
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     # WORDS_COUNTED.append(arg)
     # print(WORDS_COUNTED)
     await ctx.send('hello')
@@ -142,6 +143,11 @@ async def commands(ctx):
         Parameters:
             ctx (message.context): message sent.
     """
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     # BUG: Embedded fstring description should be string literal?
     embed = discord.Embed(
         title='Commands Lists',
@@ -165,6 +171,11 @@ async def dadjokes(ctx):
         Parameters:
             ctx (message.context): message sent.
     """
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     dadjoke = Dadjoke()
     response = '*' + dadjoke.joke + '*'
     await ctx.send(response)
@@ -176,6 +187,10 @@ async def freegames(ctx):
         Parameters:
             ctx (message.context): message sent.
     """
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     if ctx.invoked_subcommand is None:
         response = f'Sorry, your command is either wrong or insufficient. Try `{prefix}commands` for a complete list of valid commands.'
         await ctx.send(response)
@@ -187,6 +202,11 @@ async def now(ctx):
         Parameters:
             ctx (message.context): message sent.
     """
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     epicgames = EpicGames()
     epicgames.init()
     current_games = epicgames.get_current_free_games()
@@ -196,7 +216,7 @@ async def now(ctx):
             title=game['title'],
             description=game['description'],
             url=game['url'],
-            color=0x000000)
+            color=0x484848)
 
         embed.set_author(
             name='Epic Games',
@@ -206,15 +226,18 @@ async def now(ctx):
         embed.set_thumbnail(url=game['src'])
 
         embed.add_field(
-            name='Start Date',
-            value=game['startDate'],
-            inline=True)
-
+            name='Promo Period: ',
+            value=f'From {game["startDate"]} to {game["endDate"]}',
+            inline=False
+        )
+        
         embed.add_field(
-            name='End Date',
-            value=game['endDate'],
-            inline=True)
+            name='Claim your free games now at the Epic Games store!',
+            value='Disclaimer: This bot is not sponsored by Epic Games.',
+            inline=False
+        )
 
+        # embed.set_footer(text='Disclaimer: This bot is not sponsored by Epic Games.')
         await ctx.send(content=None, embed=embed)
 
 
@@ -224,6 +247,11 @@ async def later(ctx):
         Parameters:
             ctx (message.context): message sent.
     """
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     epicgames = EpicGames()
     epicgames.init()
     next_games = epicgames.get_next_free_games()
@@ -233,7 +261,7 @@ async def later(ctx):
             title=game['title'],
             description=game['description'],
             url=game['url'],
-            color=0x000000)
+            color=0x484848)
 
         embed.set_author(
             name='Epic Games',
@@ -243,14 +271,16 @@ async def later(ctx):
         embed.set_thumbnail(url=game['src'])
 
         embed.add_field(
-            name='Start Date',
-            value=game['startDate'],
-            inline=True)
-
+            name='Promo Period: ',
+            value=f'From {game["startDate"]} to {game["endDate"]}',
+            inline=False
+        )
+        
         embed.add_field(
-            name='End Date',
-            value=game['endDate'],
-            inline=True)
+            name='Claim your free games now at the Epic Games store!',
+            value='Disclaimer: This bot is not sponsored by Epic Games.',
+            inline=False
+        )
 
         await ctx.send(content=None, embed=embed)
 
@@ -263,6 +293,11 @@ async def jokes(ctx, *args):
             ctx (message.context): message sent.
             args (str): joke category.
     """
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     def find_specific_joke(jokes, category):
         for joke in jokes['jokes']:
             if joke['flags'][category]:
@@ -327,6 +362,11 @@ async def leaderboards(ctx, *args):
             ctx (message.context): message sent.
             *args (str): monitored word to check.
     """
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     word = args[0] if args else None
 
     # Invalid input
@@ -376,6 +416,11 @@ async def leaderboards(ctx, *args):
 
 @client.group()
 async def monitored(ctx):
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     if ctx.invoked_subcommand is None:
         response = f'Sorry, your command is either wrong or insufficient. Try `{prefix}commands` for a complete list of valid commands.'
         await ctx.send(response)
@@ -387,6 +432,11 @@ async def words(ctx):
         Parameters:
             ctx (message.context): message sent.
     """
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     embed = discord.Embed(
         title='List of Monitored Words',
         color=0x5c64f4)
@@ -415,6 +465,11 @@ async def stats(ctx):
         Parameters:
             ctx (message.context): message sent.
     """
+
+    # Only allow commands in bot-commands channel
+    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+        return
+
     embed = discord.Embed(
         title='Thesis Bot Statistics',
         description='\u1CBC\u1CBC',
