@@ -428,6 +428,7 @@ async def stats(ctx):
     print('  Showing bot statistics...')
     for key, value in STATS.items():
         if key == 'Bot Developers':
+            value = [discord_id['discordId'] for discord_id in value]
             value = '\n'.join(value)
         embed.add_field(
             name=key,
