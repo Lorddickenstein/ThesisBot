@@ -1,9 +1,15 @@
 import sys
+from pathlib import Path
+
+# set up base directory relative to main.py
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 COMMANDS = [
         {'command': 'commands', 'response': 'Lists all commands'},
         {'command': 'dadjokes', 'response': 'Generate a random dad joke'},
-        {'command': 'jokes or $jokes any', 'response': 'Generate any random joke'},
+        {'command': 'freegames now', 'response': 'Get the current free games from the Epic Games Store'},
+        {'command': 'freegames later', 'response': 'Get next week\'s free games from the Epic Games Store'},
+        {'command': 'jokes or !jokes any', 'response': 'Generate any random joke'},
         {'command': 'jokes christmas', 'response': 'Generate a random christmas joke'},
         {'command': 'jokes dark', 'response': 'Generate a random dark joke'},
         {'command': 'jokes explicit', 'response': 'Generate a random explicit joke'},
@@ -44,4 +50,10 @@ STATS = {
         'Bot Created': 'July 8, 2022',
 }
 
-DB_FILE = 'botconfigs/discord_db.db'
+# Database
+DB_FILE = str(BASE_DIR / 'botconfigs' / 'discord_db.db')
+
+if __name__ == '__main__':
+        print('Directories: ')
+        print('database:', DB_FILE)
+        print('root application:', BASE_DIR)
