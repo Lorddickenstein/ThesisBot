@@ -17,8 +17,10 @@ client.remove_command('help')
 # Discord Logs
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+handler = logging.FileHandler(
+    filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter(
+    '%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
 
@@ -36,6 +38,10 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    """Monitoring words without command invocation.
+        Parameters:
+            message (message.context): message detected.
+    """
     print('Message from {0.author}: {0.content}'.format(message))
 
     # ignore bot messages including self
@@ -69,11 +75,12 @@ async def on_message(message):
             words_list = []
             for word in msg.split():
                 if word in WORDS_COUNTED:
-                    print(f'  {word} has been mentioned by {author}. Inserting to database...')
+                    print(
+                        f'  {word} has been mentioned by {author}. Inserting to database...')
                     db.insert_record('word_counter',
-                        author=author_id,
-                        word=word,
-                        datetime_created=datetime_created)
+                                     author=author_id,
+                                     word=word,
+                                     datetime_created=datetime_created)
                     words_list.append(word)
                     embed.add_field(
                         name=word.capitalize(),
@@ -82,11 +89,12 @@ async def on_message(message):
 
             # count total mentions of monitored words
             words_list = dict.fromkeys(words_list)
-            print(f'  Calculating total mentions of monitored words by {author}')
+            print(
+                f'  Calculating total mentions of monitored words by {author}')
             for word, _ in words_list.items():
                 total_mentions = db.count_mentions('word_counter',
-                    author=author_id,
-                    word=word)
+                                                   author=author_id,
+                                                   word=word)
                 embed.add_field(
                     name=word.capitalize(),
                     value=f'Total mentions: `{total_mentions}`',
@@ -99,17 +107,19 @@ async def on_message(message):
 
         await message.channel.send(content=None, embed=embed)
 
-    '''Why does on_message make my commands stop working?
-    Overriding the default provided on_message forbids any extra commands from running. 
-    To fix this, add a bot.process_commands(message) line at the end of your on_message. 
-    For example:
+    # Why does on_message make my commands stop working?
+    # Overriding the default provided on_message forbids any extra commands from running.
+    # To fix this, add a bot.process_commands(message) line at the end of your on_message.
+    # For example:
 
-    @bot.event
-    async def on_message(message):
+    # @bot.event
+    # async def on_message(message):
         # do some extra stuff here
 
-        await bot.process_commands(message)'''
+        # await bot.process_commands(message)
     await client.process_commands(message)
+
+# Test / Template Command
 
 
 @client.command()
@@ -125,6 +135,10 @@ async def test(ctx, *, arg):
 
 @client.command()
 async def commands(ctx):
+    """Lists commands available.
+        Parameters:
+            ctx (message.context): message sent.
+    """
     embed = discord.Embed(
         title='Commands Lists',
         description='Hello, I\'m the product of your horrible thesis. Please refer to the commands below on how to use me.\n\u1CBC\u1CBC',
@@ -143,6 +157,10 @@ async def commands(ctx):
 
 @client.command()
 async def dadjokes(ctx):
+    """Show a dad joke.
+        Parameters:
+            ctx (message.context): message sent.
+    """
     dadjoke = Dadjoke()
     response = '*' + dadjoke.joke + '*'
     await ctx.send(response)
@@ -150,7 +168,11 @@ async def dadjokes(ctx):
 
 @client.command()
 async def jokes(ctx, *args):
-
+    """Output a joke. Can have optional args for the category of jokes.
+        Parameters:
+            ctx (message.context): message sent.
+            args (str): joke category.
+    """
     def find_specific_joke(jokes, category):
         for joke in jokes['jokes']:
             if joke['flags'][category]:
@@ -190,7 +212,8 @@ async def jokes(ctx, *args):
         joke = await j.get_joke()
 
     if joke:
-        print(f'  Joke found with category: {joke["category"]}, flags: {joke["flags"]}...')
+        print(
+            f'  Joke found with category: {joke["category"]}, flags: {joke["flags"]}...')
 
         # one-liner jokes
         if joke['type'] == 'single':
@@ -209,6 +232,11 @@ async def jokes(ctx, *args):
 
 @client.command()
 async def leaderboards(ctx, *args):
+    """Display leaderboards of monitored words.
+        Parameters:
+            ctx (message.context): message sent.
+            *args (str): monitored word to check.
+    """
     word = args[0] if args else None
 
     # Invalid input
@@ -256,17 +284,23 @@ async def leaderboards(ctx, *args):
     await ctx.send(content=None, embed=embed)
 
 
+# TODO: This cmd is lame af
 @client.group()
 async def monitored(ctx):
     if ctx.invoked_subcommand is None:
         response = f'Sorry, your command is insufficient. Try `{prefix}commands` for a complete list of valid commands.'
         await ctx.send('response')
 
+
 @monitored.command()
 async def words(ctx):
+    """Display monitored words.
+        Parameters:
+            ctx (message.context): message sent.
+    """
     embed = discord.Embed(
-            title='List of Monitored Words',
-            color=0x5c64f4)
+        title='List of Monitored Words',
+        color=0x5c64f4)
 
     with Database(DB_FILE) as db:
         print(f'  Calculating total mentions...')
@@ -274,7 +308,7 @@ async def words(ctx):
         # count total mentions of each monitored word
         for word in WORDS_COUNTED:
             total_mentions = db.count_mentions('word_counter',
-                word=word)
+                                               word=word)
             embed.add_field(
                 name=word.capitalize(),
                 value=f'Total mentions: `{total_mentions}`',
@@ -283,12 +317,15 @@ async def words(ctx):
             name='\u1CBC\u1CBC',
             value=f'Type `{prefix}leaderboards` to display all leaderboards.',
             inline=False)
-
     await ctx.send(content=None, embed=embed)
 
 
 @client.command()
 async def stats(ctx):
+    """List bot information and statistics.
+        Parameters:
+            ctx (message.context): message sent.
+    """
     embed = discord.Embed(
         title='Thesis Bot Statistics',
         description='\u1CBC\u1CBC',
@@ -305,8 +342,5 @@ async def stats(ctx):
             value=value)
     await ctx.send(content=None, embed=embed)
 
-@client.command()
-async def ping(ctx):
-    await ctx.send('**If this appears you can live edit while running on Heroku!\nLets go meet at <#807284429524434969> to celebrate!**')
 
 client.run(token)
