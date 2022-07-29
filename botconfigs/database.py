@@ -133,6 +133,11 @@ class Database:
 				
 		return leaderboards
 
+	def add_word(self, word):
+		# TODO: Add functionality to add new words in table
+		# TODO: Add functionality to add new words in table if user has proper permissions e.g. admins
+		pass
+
 
 	def close(self):
 		""" close the connection """
