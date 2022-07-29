@@ -431,8 +431,9 @@ async def stats(ctx):
         if key == 'Bot Developers':
             authors = []
             for val in value:
+                print(val['discordId'])
                 member = await client.fetch_user(int(val['discordId']))
-                authors.append(f'<@{val["discordId"]}> - {member.name}#{member.discriminator}')
+                authors.append(f'{member.name}#{member.discriminator} <@{val["discordId"]}>')
             value = '\n'.join(authors)
         
         embed.add_field(
