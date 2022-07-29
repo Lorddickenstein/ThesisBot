@@ -227,12 +227,12 @@ async def now(ctx):
 
         embed.add_field(
             name='Promo Period: ',
-            value=f'From {game["startDate"]} to {game["endDate"]}',
+            value=f'From **{game["startDate"]}** to **{game["endDate"]}**',
             inline=False
         )
         
         embed.add_field(
-            name='Claim your free games now at the Epic Games store!',
+            name='Claim your free games now at the Epic Games Store!',
             value='Disclaimer: This bot is not sponsored by Epic Games.',
             inline=False
         )
@@ -272,12 +272,12 @@ async def later(ctx):
 
         embed.add_field(
             name='Promo Period: ',
-            value=f'From {game["startDate"]} to {game["endDate"]}',
+            value=f'From **{game["startDate"]}** to **{game["endDate"]}**',
             inline=False
         )
         
         embed.add_field(
-            name='Claim your free games now at the Epic Games store!',
+            name='Claim your free games now at the Epic Games Store!',
             value='Disclaimer: This bot is not sponsored by Epic Games.',
             inline=False
         )
