@@ -8,11 +8,11 @@ class Database:
 
 
 	def __enter__(self):
-		print(f'  Connecting to {self.db_name} database v.{sqlite3.version}...')
+		print(f'    Connecting to {self.db_name} database v.{sqlite3.version}...')
 		self.conn = sqlite3.connect(self.db_name)
 		self.conn.row_factory = sqlite3.Row
 		self.cur = self.conn.cursor()
-		print('  Connection established...')
+		print('    Connection established...')
 		return self
 
 
@@ -39,14 +39,14 @@ class Database:
 		query = query[:-1] + ')'
 		# print(query)
 
-		print(f'  Inserting record to {table_name}...')
+		print(f'    Inserting record to {table_name}...')
 		try:
 			self.cur.execute(query)
 			self.conn.commit()
-			print('  Inserting record successful.')
+			print('    Inserting record successful.')
 		except Error as err:
 			self.conn.rollback()
-			print('  Inserting unsuccessful.', err)
+			print('    Inserting unsuccessful.', err)
 
 
 	def count_mentions(self, table_name, **args):
@@ -65,8 +65,6 @@ class Database:
 			query += key + ','
 		query = query[:-1]
 
-		# print(query)
-		print('  Executing query for counting total mentions...')
 		rows = self.cur.execute(query).fetchall()
 		if len(rows) == 1:
 			key = rows[0].keys()[0]
@@ -79,7 +77,7 @@ class Database:
 		""" return a list of all monitored words """
 
 		query = 'SELECT DISTINCT word FROM monitored_words'
-		print('  Executing query for getting all monitored words...')
+		print('    Retrieving all monitored words...')
 		rows = self.cur.execute(query).fetchall()
 		words_list = [row['word'] for row in rows]
 		return words_list
@@ -121,17 +119,17 @@ class Database:
 		'''
 
 		if word:
-			print(f'  Executing query for getting {word} leaderboards...')
+			print(f'    Retrieving {word} leaderboards from the database...')
 			rows = get_rows(word, limit)
 			leaderboards[word] = [{'count': row[0], 'author': row[1]} for row in rows]
 		else:
-			print('  Executing query for getting all leaderboards...')
+			print('    Retrieving all leaderboards from the database...')
 			words_list = self.get_all_words()
 
 			for word in words_list:
 				rows = get_rows(word, limit)
 				leaderboards[word] = [{'count': row[0], 'author': row[1]} for row in rows]
-			print('  Learderboards loaded successfully...')
+			print('    Learderboards loaded successfully...')
 				
 		return leaderboards
 
