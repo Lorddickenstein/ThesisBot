@@ -7,7 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 COMMANDS = [
         {'command': 'commands', 'response': 'Lists all commands'},
         {'command': 'dadjokes', 'response': 'Generate a random dad joke'},
-        {'command': 'jokes or $jokes any', 'response': 'Generate any random joke'},
+        {'command': 'freegames now', 'response': 'Get the current free games from the Epic Games Store'},
+        {'command': 'freegames later', 'response': 'Get next week\'s free games from the Epic Games Store'},
+        {'command': 'jokes or !jokes any', 'response': 'Generate any random joke'},
         {'command': 'jokes christmas', 'response': 'Generate a random christmas joke'},
         {'command': 'jokes dark', 'response': 'Generate a random dark joke'},
         {'command': 'jokes explicit', 'response': 'Generate a random explicit joke'},

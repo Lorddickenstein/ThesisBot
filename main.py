@@ -31,6 +31,7 @@ async def on_ready():
     global WORDS_COUNTED
     with Database(DB_FILE) as db:
         WORDS_COUNTED = db.get_all_words()
+    print('  Global variables initialized. Awaiting commands...')
 
     await client.change_presence(activity=discord.Game(name="your mom"))
 
@@ -150,29 +151,31 @@ async def dadjokes(ctx):
 
 
 @client.group()
-async def epicgames(ctx):
-	if ctx.invoked_subcommand is None:
-		response = f'Sorry, your command is insufficient. Try `{prefix}commands` for a complete list of valid commands.'
-		await ctx.send('response')
+async def freegames(ctx, args):
+	freegames_commands = ['now', 'later']
+	if ctx.invoked_subcommand is None or args not in freegames_commands:
+		response = f'Sorry, your command is either wrong or insufficient. Try `{prefix}commands` for a complete list of valid commands.'
+		await ctx.send(response)
 
-@epicgames.command()
-async def current(ctx):
+@freegames.command()
+async def now(ctx):
 	epicgames = EpicGames()
 	epicgames.init()
 	current_games = epicgames.get_current_free_games()
+
 	for game in current_games:
 		embed = discord.Embed(
 			title=game['title'],
 			description=game['description'],
 			url=game['url'],
-			color=0x00aff4)
+			color=0x000000)
+
 		embed.set_author(
 			name='Epic Games',
 			url='https://store.epicgames.com/en-US/free-games/',
 			icon_url='https://cdn2.unrealengine.com/Unreal+Engine%2Feg-logo-filled-1255x1272-0eb9d144a0f981d1cbaaa1eb957de7a3207b31bb.png')
-		embed.set_thumbnail(
-			url=game['src']
-		)
+
+		embed.set_thumbnail(url=game['src'])
 
 		embed.add_field(
 			name='Start Date',
@@ -182,12 +185,12 @@ async def current(ctx):
 		embed.add_field(
 			name='End Date',
 			value=game['endDate'],
-			inline=True
-		)
+			inline=True)
+
 		await ctx.send(content=None, embed=embed)
 
-@epicgames.command()
-async def next(ctx):
+@freegames.command()
+async def later(ctx):
 	epicgames = EpicGames()
 	epicgames.init()
 	next_games = epicgames.get_next_free_games()
@@ -197,14 +200,14 @@ async def next(ctx):
 			title=game['title'],
 			description=game['description'],
 			url=game['url'],
-			color=0x00aff4)
+			color=0x000000)
+
 		embed.set_author(
 			name='Epic Games',
 			url='https://store.epicgames.com/en-US/free-games/',
 			icon_url='https://cdn2.unrealengine.com/Unreal+Engine%2Feg-logo-filled-1255x1272-0eb9d144a0f981d1cbaaa1eb957de7a3207b31bb.png')
-		embed.set_thumbnail(
-			url=game['src']
-		)
+
+		embed.set_thumbnail(url=game['src'])
 
 		embed.add_field(
 			name='Start Date',
@@ -214,8 +217,8 @@ async def next(ctx):
 		embed.add_field(
 			name='End Date',
 			value=game['endDate'],
-			inline=True
-		)
+			inline=True)
+
 		await ctx.send(content=None, embed=embed)
 
 
@@ -328,10 +331,10 @@ async def leaderboards(ctx, *args):
 
 
 @client.group()
-async def monitored(ctx):
-    if ctx.invoked_subcommand is None:
-        response = f'Sorry, your command is insufficient. Try `{prefix}commands` for a complete list of valid commands.'
-        await ctx.send('response')
+async def monitored(ctx, args):
+    if ctx.invoked_subcommand is None or args != 'words':
+        response = f'Sorry, your command is either wrong or insufficient. Try `{prefix}commands` for a complete list of valid commands.'
+        await ctx.send(response)
 
 @monitored.command()
 async def words(ctx):
