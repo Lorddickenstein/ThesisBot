@@ -13,7 +13,7 @@ token = os.getenv('BOT_TOKEN')
 prefix = '!'
 intents = discord.Intents.default()
 client = commands.Bot(command_prefix=prefix, intents=intents)
-client.remove_command('help')
+# client.remove_command('help')
 
 # Discord Logs
 logger = logging.getLogger('discord')
