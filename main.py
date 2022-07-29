@@ -419,8 +419,9 @@ async def stats(ctx):
     embed = discord.Embed(
         title='Thesis Bot Statistics',
         description='\u1CBC\u1CBC',
-        url=f'https://discord.com/users/{ctx.author.id}',
+        url=f'https://discord.com/users/{client.user.id}',
         color=0x00aff4)
+
     embed.set_author(
         name='Thesis Bot',
         icon_url=client.user.avatar_url)
@@ -428,8 +429,12 @@ async def stats(ctx):
     print('  Showing bot statistics...')
     for key, value in STATS.items():
         if key == 'Bot Developers':
-            value = [discord_id['discordId'] for discord_id in value]
-            value = '\n'.join(value)
+            authors = []
+            for val in value:
+                member = await client.fetch_user(int(val['discordId']))
+                authors.append(f'<@{val["discordId"]}> - {member.name}#{member.discriminator}')
+            value = '\n'.join(authors)
+        
         embed.add_field(
             name=key,
             value=value)
