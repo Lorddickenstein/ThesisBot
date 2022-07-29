@@ -46,7 +46,11 @@ STATS = {
         'Discord.py Version': '1.7.3',
         'Total Users': '*Not yet coded*',
         'Total Guilds': '*Not yet coded*',
-        'Bot Developers': '<@756084838154633237>',
+        'Bot Developers': [
+                {'name': 'Jerson', 'discordId':'<@756084838154633237>'},
+                {'name': 'King', 'discordId': '<@645255797340766218>'},
+                {'name': 'Ramil', 'discordId': '<@460745694794481666>'},
+                ],
         'Bot Created': 'July 8, 2022',
 }
 
