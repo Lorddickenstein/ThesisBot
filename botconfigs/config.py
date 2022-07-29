@@ -41,7 +41,7 @@ BLACKLISTED = ['nsfw', 'religious', 'political', 'racist', 'sexist', 'explicit']
 CATEGORIES = ['any', 'misc', 'programming', 'dark', 'pun', 'spooky', 'christmas']
 
 STATS = {
-        'Bot Version': '0.1 beta',
+        'Bot Version': '0.2 beta',
         'Python version': '.'.join(map(str, sys.version_info[:3])),
         'Discord.py Version': '1.7.3',
         'Total Users': '*Not yet coded*',
