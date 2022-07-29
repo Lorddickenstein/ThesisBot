@@ -3,6 +3,7 @@ import logging
 import os
 from botconfigs.config import *
 from botconfigs.database import Database
+from botconfigs.epicgames import EpicGames
 from dadjokes import Dadjoke
 from datetime import datetime
 from discord.ext import commands
@@ -146,6 +147,76 @@ async def dadjokes(ctx):
     dadjoke = Dadjoke()
     response = '*' + dadjoke.joke + '*'
     await ctx.send(response)
+
+
+@client.group()
+async def epicgames(ctx):
+	if ctx.invoked_subcommand is None:
+		response = f'Sorry, your command is insufficient. Try `{prefix}commands` for a complete list of valid commands.'
+		await ctx.send('response')
+
+@epicgames.command()
+async def current(ctx):
+	epicgames = EpicGames()
+	epicgames.init()
+	current_games = epicgames.get_current_free_games()
+	for game in current_games:
+		embed = discord.Embed(
+			title=game['title'],
+			description=game['description'],
+			url=game['url'],
+			color=0x00aff4)
+		embed.set_author(
+			name='Epic Games',
+			url='https://store.epicgames.com/en-US/free-games/',
+			icon_url='https://cdn2.unrealengine.com/Unreal+Engine%2Feg-logo-filled-1255x1272-0eb9d144a0f981d1cbaaa1eb957de7a3207b31bb.png')
+		embed.set_thumbnail(
+			url=game['src']
+		)
+
+		embed.add_field(
+			name='Start Date',
+			value=game['startDate'],
+			inline=True)
+
+		embed.add_field(
+			name='End Date',
+			value=game['endDate'],
+			inline=True
+		)
+		await ctx.send(content=None, embed=embed)
+
+@epicgames.command()
+async def next(ctx):
+	epicgames = EpicGames()
+	epicgames.init()
+	next_games = epicgames.get_next_free_games()
+
+	for game in next_games:
+		embed = discord.Embed(
+			title=game['title'],
+			description=game['description'],
+			url=game['url'],
+			color=0x00aff4)
+		embed.set_author(
+			name='Epic Games',
+			url='https://store.epicgames.com/en-US/free-games/',
+			icon_url='https://cdn2.unrealengine.com/Unreal+Engine%2Feg-logo-filled-1255x1272-0eb9d144a0f981d1cbaaa1eb957de7a3207b31bb.png')
+		embed.set_thumbnail(
+			url=game['src']
+		)
+
+		embed.add_field(
+			name='Start Date',
+			value=game['startDate'],
+			inline=True)
+
+		embed.add_field(
+			name='End Date',
+			value=game['endDate'],
+			inline=True
+		)
+		await ctx.send(content=None, embed=embed)
 
 
 @client.command()
