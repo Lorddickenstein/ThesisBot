@@ -1,9 +1,9 @@
-import sys
 from pathlib import Path
 
 # set up base directory relative to main.py
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# TODO: Rewrite the commands list by grouping commands together by category or relatedness
 COMMANDS = [
         {'command': 'commands', 'response': 'Lists all commands'},
         {'command': 'dadjokes', 'response': 'Generate a random dad joke'},
@@ -23,7 +23,7 @@ COMMANDS = [
         {'command': 'jokes sexist', 'response': 'Generate a random sexist joke'},
         {'command': 'jokes spooky', 'response': 'Generate a random spooky joke'},
         {'command': 'leaderboards', 'response': 'Display top mentions of watchlisted words'},
-        {'command': 'leaderboards <monitored_words>', 'response': 'Display top mentions of a specific watchlisted word'},
+        {'command': 'leaderboards <monitored words>', 'response': 'Display top mentions of a specific watchlisted word'},
         {'command': 'monitored words', 'response': 'List all monitored words'},
         {'command': 'sorry', 'response': 'I hate this command. Please never use it.'},
         {'command': 'stats', 'response': 'Display bot statistics'},
@@ -42,7 +42,7 @@ CATEGORIES = ['any', 'misc', 'programming', 'dark', 'pun', 'spooky', 'christmas'
 
 STATS = {
         'Bot Version': '0.2 beta',
-        'Python version': '.'.join(map(str, sys.version_info[:3])),
+        'Python version': '3.9.6',
         'Discord.py Version': '1.7.3',
         'Total Users': '*Not yet coded*',
         'Total Guilds': '*Not yet coded*',
@@ -57,6 +57,7 @@ STATS = {
 # Database
 DB_FILE = str(BASE_DIR / 'botconfigs' / 'discord_db.db')
 
+# Bot Restrictions
 BOT_RESTRICTIONS = {
         'allowed-channels': ['bot-commands'],
 }
