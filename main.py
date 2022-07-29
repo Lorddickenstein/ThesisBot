@@ -151,9 +151,8 @@ async def dadjokes(ctx):
 
 
 @client.group()
-async def freegames(ctx, args):
-	freegames_commands = ['now', 'later']
-	if ctx.invoked_subcommand is None or args not in freegames_commands:
+async def freegames(ctx):
+	if ctx.invoked_subcommand is None:
 		response = f'Sorry, your command is either wrong or insufficient. Try `{prefix}commands` for a complete list of valid commands.'
 		await ctx.send(response)
 
@@ -331,8 +330,8 @@ async def leaderboards(ctx, *args):
 
 
 @client.group()
-async def monitored(ctx, args):
-    if ctx.invoked_subcommand is None or args != 'words':
+async def monitored(ctx):
+    if ctx.invoked_subcommand is None:
         response = f'Sorry, your command is either wrong or insufficient. Try `{prefix}commands` for a complete list of valid commands.'
         await ctx.send(response)
 
