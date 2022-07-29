@@ -376,5 +376,8 @@ async def stats(ctx):
             value=value)
     await ctx.send(content=None, embed=embed)
 
+@client.command()
+async def ping(ctx):
+    await ctx.send('**If this appears you can live edit while running on Heroku!\nLets go meet at <#807284429524434969> to celebrate!**')
 
 client.run(token)
