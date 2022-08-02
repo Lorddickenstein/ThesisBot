@@ -1,9 +1,9 @@
+import sys
 from pathlib import Path
 
 # set up base directory relative to main.py
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# TODO: Rewrite the commands list by grouping commands together by category or relatedness
 COMMANDS = [
         {'command': 'commands', 'response': 'Lists all commands'},
         {'command': 'dadjokes', 'response': 'Generate a random dad joke'},
@@ -23,7 +23,7 @@ COMMANDS = [
         {'command': 'jokes sexist', 'response': 'Generate a random sexist joke'},
         {'command': 'jokes spooky', 'response': 'Generate a random spooky joke'},
         {'command': 'leaderboards', 'response': 'Display top mentions of watchlisted words'},
-        {'command': 'leaderboards <monitored words>', 'response': 'Display top mentions of a specific watchlisted word'},
+        {'command': 'leaderboards <monitored_words>', 'response': 'Display top mentions of a specific watchlisted word'},
         {'command': 'monitored words', 'response': 'List all monitored words'},
         {'command': 'sorry', 'response': 'I hate this command. Please never use it.'},
         {'command': 'stats', 'response': 'Display bot statistics'},
@@ -41,8 +41,8 @@ BLACKLISTED = ['nsfw', 'religious', 'political', 'racist', 'sexist', 'explicit']
 CATEGORIES = ['any', 'misc', 'programming', 'dark', 'pun', 'spooky', 'christmas']
 
 STATS = {
-        'Bot Version': '0.2 beta',
-        'Python version': '3.9.6',
+        'Bot Version': '0.3 beta',
+        'Python version': '.'.join(map(str, sys.version_info[:3])),
         'Discord.py Version': '1.7.3',
         'Total Users': '*Not yet coded*',
         'Total Guilds': '*Not yet coded*',
@@ -57,12 +57,20 @@ STATS = {
 # Database
 DB_FILE = str(BASE_DIR / 'botconfigs' / 'discord_db.db')
 
-# Bot Restrictions
-BOT_RESTRICTIONS = {
-        'allowed-channels': ['bot-commands'],
-}
+# Bot
+BOT_PREFIX = '$'
 
-if __name__ == '__main__':
-        print('Directories: ')
-        print('database:', DB_FILE)
-        print('root application:', BASE_DIR)
+BOT_COMMANDS = [
+        {'command': 'commands', 'response': 'Lists all bot commands.'},
+        {'command': 'dadjokes', 'response': 'Generate a random dad joke.'},
+        {'command': 'devmode <on/off>', 'response': 'Turn developer mode on/off.'},
+        {'command': 'freegames <period>', 'response': 'Get the current or next free games from the Epic Games Store. `period` can be `now` or `later`.'},
+        {'command': 'jokes <optional: category>', 'response': f'Generate a random joke with optional `category`. Type `{BOT_PREFIX}jokes categories` to see all categories.'},
+        {'command': 'leaderboards <optional: monitored word>', 'response': f'Get the leaderboards for all or just one specified monitored word. Type `{BOT_PREFIX}monitored words` to display all monitored words.'},
+        {'command': 'monitored words', 'response': f'Get a list of all monitored words.'},
+        {'command': 'stats', 'response': 'Display bot statistics'}
+]
+
+BOT_RESTRICTIONS = {
+        'allowed-channels': ['bot-commands', 'free-games-reminder'],
+}
