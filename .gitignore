@@ -1,3 +1,7 @@
+__pycache__
+discord.log
+
 botconfigs/__pycache__
 botconfigs/discord_db.db
-discord.log
+
+cogs/__pycache__

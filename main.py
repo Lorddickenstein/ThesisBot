@@ -3,16 +3,12 @@ import logging
 import os
 from botconfigs.config import *
 from botconfigs.database import Database
-from botconfigs.epicgames import EpicGames
-from dadjokes import Dadjoke
-from datetime import datetime
-from discord.ext import commands
-from jokeapi import Jokes
+from botconfigs.utils import get_local_time_now, get_datetime, format_date
+from discord.ext import commands, tasks
 
 token = os.getenv('BOT_TOKEN')
-prefix = '!'
 intents = discord.Intents.default()
-client = commands.Bot(command_prefix=prefix, intents=intents)
+client = commands.Bot(command_prefix=BOT_PREFIX, intents=intents)
 # client.remove_command('help')     # HACK: native !help command from discord.py
 
 # Discord Logs
@@ -27,31 +23,50 @@ logger.addHandler(handler)
 
 @client.event
 async def on_ready():
-    print('Logged on as {0}!'.format(client.user))
+    print('  Logged on as {0}!'.format(client.user))
 
+    # TODO: Initialize global variables
     print('  Initializing global variables...')
-    global WORDS_COUNTED
-    with Database(DB_FILE) as db:
-        WORDS_COUNTED = db.get_all_words()
-    print('  Global variables initialized...\n  Awaiting commands...')
+    global EPICGAMES, MONITORED_WORDS, DEVMODE
 
+    print('    Initializing MONITORED_WORDS...')
+    with Database(DB_FILE) as db:
+        MONITORED_WORDS = db.get_all_words()
+
+    print('    Initializing EPICGAMES...')
+    EPICGAMES = client.get_cog('EpicGamesCog')
+
+    # Turn DEVMODE off by default
+    print('    Turning DEVMODE off by default...')
+    DEVMODE = False
+
+    print('  Global variables initialized...')
+
+    if not check_epicgames_updates.is_running():
+        check_epicgames_updates.start()
+
+    print('  Bot ready, awaiting commands...')
     await client.change_presence(activity=discord.Game(name="your mom"))
 
 
-# FIXME: ffffkin nuclear level refactoring required
 @client.event
 async def on_message(message):
-    """Monitoring words without command invocation.
-        Parameters:
+    """
+        Monitoring words without command invocations.
+
+        params:
             message (message.context): message detected.
     """
-    print('Message from {0.author}: {0.content}'.format(message))
 
     # ignore bot messages including self
     if message.author == client.user or message.author.bot:
         return
+    
+    print('Message from {0.author}: {0.content}'.format(message))
 
     msg = message.content.lower()
+    guild_id = message.guild.id
+    guild_name = message.guild.name
     author = message.author
     author_id = message.author.id
 
@@ -59,53 +74,60 @@ async def on_message(message):
     if msg.endswith('more like'):
         response = 'Bore Ragnarok!'
         await message.channel.send(response)
-
+    
     # apologetic people amirite? (thesis groupmates reference - also ignore this)
-    elif any(words in msg for words in SORRY_WORDS):
+    if any(words in msg for words in SORRY_WORDS):
         response = 'Stop apologizing so much!!! It\'s **CRINGE!!!**'
         await message.channel.send(response)
-
+    
     # word counter
-    elif any(word in msg.split() for word in WORDS_COUNTED) and not msg.startswith(prefix):
+    elif any(word in msg.split() for word in MONITORED_WORDS[guild_id]) and not msg.startswith(BOT_PREFIX):
         embed = discord.Embed(
-            title='Word Counter (Global)',
+            title='Word Counter (Server)',
             color=0x28b463)
-        date_now = datetime.now()
-        datetime_created = date_now.strftime('%Y-%m-%d %H:%M')
+
+        datetime_created = get_local_time_now('%Y-%m-%d %H:%M:%S')
 
         with Database(DB_FILE) as db:
             # insert all mentions of monitored words
             words_list = []
             for word in msg.split():
-                if word in WORDS_COUNTED:
+                if word in MONITORED_WORDS[guild_id]:
                     print(
-                        f'  {word} has been mentioned by {author}. Inserting to database...')
+                        f'  {word} has been mentioned by {author}.\n    Inserting {word} into database...')
                     db.insert_record('word_counter',
                                      author=author_id,
                                      word=word,
-                                     datetime_created=datetime_created)
+                                     datetime_created=format_date(datetime_created, '%Y-%m-%d %H:%M:%S'),
+                                     guildId=guild_id)
                     words_list.append(word)
                     embed.add_field(
                         name=word.capitalize(),
                         value=f'Has been mentioned by <@{author_id}>',
-                        inline=False)
+                        inline=True)
+            
+            embed.add_field(
+                name='\u1CBC\u1CBC',
+                value='\u1CBC\u1CBC',
+                inline=False)
 
             # count total mentions of monitored words
             words_list = dict.fromkeys(words_list)
-            print(
-                f'  Calculating total mentions of monitored words by {author}')
+            value = ''
             for word, _ in words_list.items():
                 total_mentions = db.count_mentions('word_counter',
                                                    author=author_id,
                                                    word=word)
-                embed.add_field(
-                    name=word.capitalize(),
-                    value=f'Total mentions: `{total_mentions}`',
-                    inline=False)
+                value += f'**`{word.capitalize()}`** total mentions: `{total_mentions}`\n'
+            
+            embed.add_field(
+                name=f'`{author}`\'s overall record in `{guild_name}`.',
+                value=value,
+                inline=False)
 
             embed.add_field(
                 name='\u1CBC\u1CBC',
-                value=f'Type `{prefix}leaderboards` to display leaderboards or `{prefix}monitored words` to display a list of monitored words.',
+                value=f'Type `{BOT_PREFIX}leaderboards` to display leaderboards or `{BOT_PREFIX}monitored words` to display a list of monitored words.',
                 inline=False)
 
         await message.channel.send(content=None, embed=embed)
@@ -122,341 +144,162 @@ async def on_message(message):
         # await bot.process_commands(message)
     await client.process_commands(message)
 
-# Test / Template Command
 
+@tasks.loop(seconds=1.0)
+async def check_epicgames_updates():
+    """ 
+        Check if there are new updates in Epic Games Store every 24 hours
+    """
+    
+    now  = get_local_time_now('%H:%M:%S')
 
-@client.command()
-async def test(ctx, arg):
-
-    # Only allow commands in bot-commands channel
-    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+    # only check for updates at 11:00 PM Manila Time
+    if now != get_datetime('23:00:00', '%H:%M:%S'):
         return
 
-    # WORDS_COUNTED.append(arg)
-    # print(WORDS_COUNTED)
-    await ctx.send('hello')
+    with Database(DB_FILE) as db:
+        # update games status before getting rows
+        print('  Updating games in database...')
+        db.update_game_status()
+        games_db = db.get_games()
+
+        # get current free games from epic games
+        print('  Checking updates from Epic Games Store...')
+        games = await EPICGAMES.get_updates()
+
+        # insert new games into database
+        ctr = 0
+        for status, games_dict in games.items():
+            for game in games_dict:
+                if game not in games_db[status]:
+                    ctr += 1 
+                    db.insert_record('free_games',
+                        title=game['title'],
+                        gameId=game['gameId'],
+                        description=game['description'],
+                        startDate=format_date(game['startDate'], '%Y-%m-%d %H:%M:%S'),
+                        endDate=format_date(game['endDate'], '%Y-%m-%d %H:%M:%S'),
+                        url=game['url'],
+                        icon=game['icon'],
+                        status=game['status'])
+        if ctr > 0:
+            print('  Found {} new updates...'.format(ctr))
+
+            # send embedded messages to discord channel #free-games-reminder
+            print('  Showing current and upcoming free games...')
+            for channel in client.get_all_channels():
+                if (channel.type == discord.ChannelType.text) and (channel.name == 'free-games-reminder'):
+                    await EPICGAMES.init()
+                    await channel.send(f'Update as of **{now}**:')
+                    embeds = await EPICGAMES.get_embeds('now') + await EPICGAMES.get_embeds('later')
+                    for embed in embeds:
+                        await channel.send(content=None, embed=embed)
+        else:
+            print('  No new updates...')
 
 
 @client.command()
 async def commands(ctx):
-    """Lists commands available.
-        Parameters:
+    """
+        List all commands.
+
+        Params:
             ctx (message.context): message sent.
     """
 
-    # Only allow commands in bot-commands channel
+    # only allow commands in bot-commands channel
     if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
         return
 
-    # BUG: Embedded fstring description should be string literal?
     embed = discord.Embed(
         title='Commands Lists',
         description='Hello, I\'m the product of your horrible thesis. Please refer to the commands below on how to use me.\n\u1CBC\u1CBC',
         color=0xf1c40f)
 
     print('  Showing commands list...')
-    for command in COMMANDS:
+    for command in BOT_COMMANDS:
         embed.add_field(
-            name=prefix + command.get('command'),
+            name=BOT_PREFIX + command.get('command'),
             value=command.get('response'),
-            inline=True)
-
+            inline=False)
+    
     embed.set_footer(text='Bot created on July 8, 2022.')
     await ctx.send(content=None, embed=embed)
-
+    
 
 @client.command()
-async def dadjokes(ctx):
-    """Show a dad joke.
-        Parameters:
+async def devmode(ctx, *args):
+    """
+        Toggle devmode.
+        
+        Params:
             ctx (message.context): message sent.
     """
-
+    
     # Only allow commands in bot-commands channel
     if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
         return
+    
+    # return if args is not recognized or has too many arguments
+    if len(args) > 1 or len(args) == 1 and args[0].lower() not in ['on', 'off']:
+        response = f'Bruh it\'s `on` and `off` only. Try again.'
+        await ctx.send(response)
+        return
 
-    dadjoke = Dadjoke()
-    response = '*' + dadjoke.joke + '*'
+    global DEVMODE
+
+    status = args[0] if len(args) == 1 else None
+
+    if status == 'on':
+        DEVMODE = True
+        response = '`devmode` is now **on**.'
+    elif status == 'off':
+        DEVMODE = False
+        response = '`devmode` is now **off**.'
+    else:
+        response = '`devmode` is currently **{}**.'.format('on' if DEVMODE else 'off')
+    
     await ctx.send(response)
 
 
-@client.group()
-async def freegames(ctx):
-    """Display free games. Invokes `.now` and `.later` subcommands.
-        Parameters:
-            ctx (message.context): message sent.
-    """
-    # Only allow commands in bot-commands channel
-    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
-        return
-
-    if ctx.invoked_subcommand is None:
-        response = f'Sorry, your command is either wrong or insufficient. Try `{prefix}commands` for a complete list of valid commands.'
-        await ctx.send(response)
-
-
-@freegames.command()
-async def now(ctx):
-    """Display currently free games. Called by client.command().
-        Parameters:
-            ctx (message.context): message sent.
-    """
-
-    # Only allow commands in bot-commands channel
-    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
-        return
-
-    epicgames = EpicGames()
-    epicgames.init()
-    current_games = epicgames.get_current_free_games()
-
-    for game in current_games:
-        embed = discord.Embed(
-            title=game['title'],
-            description=game['description'],
-            url=game['url'],
-            color=0x484848)
-
-        embed.set_author(
-            name='Epic Games',
-            url='https://store.epicgames.com/en-US/free-games/',
-            icon_url='https://cdn2.unrealengine.com/Unreal+Engine%2Feg-logo-filled-1255x1272-0eb9d144a0f981d1cbaaa1eb957de7a3207b31bb.png')
-
-        embed.set_thumbnail(url=game['src'])
-
-        embed.add_field(
-            name='Promo Period: ',
-            value=f'From **{game["startDate"]}** to **{game["endDate"]}**',
-            inline=False
-        )
-        
-        embed.add_field(
-            name='Claim your free games now at the Epic Games Store!',
-            value='Disclaimer: This bot is not sponsored by Epic Games.',
-            inline=False
-        )
-
-        # embed.set_footer(text='Disclaimer: This bot is not sponsored by Epic Games.')
-        await ctx.send(content=None, embed=embed)
-
-
-@freegames.command()
-async def later(ctx):
-    """Display upcoming free games. Called by client.command().
-        Parameters:
-            ctx (message.context): message sent.
-    """
-
-    # Only allow commands in bot-commands channel
-    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
-        return
-
-    epicgames = EpicGames()
-    epicgames.init()
-    next_games = epicgames.get_next_free_games()
-
-    for game in next_games:
-        embed = discord.Embed(
-            title=game['title'],
-            description=game['description'],
-            url=game['url'],
-            color=0x484848)
-
-        embed.set_author(
-            name='Epic Games',
-            url='https://store.epicgames.com/en-US/free-games/',
-            icon_url='https://cdn2.unrealengine.com/Unreal+Engine%2Feg-logo-filled-1255x1272-0eb9d144a0f981d1cbaaa1eb957de7a3207b31bb.png')
-
-        embed.set_thumbnail(url=game['src'])
-
-        embed.add_field(
-            name='Promo Period: ',
-            value=f'From **{game["startDate"]}** to **{game["endDate"]}**',
-            inline=False
-        )
-        
-        embed.add_field(
-            name='Claim your free games now at the Epic Games Store!',
-            value='Disclaimer: This bot is not sponsored by Epic Games.',
-            inline=False
-        )
-
-        await ctx.send(content=None, embed=embed)
-
-
-# XXX: args should be broken down to different jokes.command() subcommands
 @client.command()
-async def jokes(ctx, *args):
-    """Output a joke. Can have optional args for the category of jokes.
-        Parameters:
+async def load(ctx, extension):
+    """"
+        Load an extension.
+        
+        Params:
             ctx (message.context): message sent.
-            args (str): joke category.
+            extension (str): extension to load.
     """
 
-    # Only allow commands in bot-commands channel
-    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+    # Only allow if devmode is on
+    if not DEVMODE:
+        await ctx.send(f'`devmode` is **off**.')
         return
 
-    def find_specific_joke(jokes, category):
-        for joke in jokes['jokes']:
-            if joke['flags'][category]:
-                return joke
-        return
-
-    # Invalid input
-    if len(args) > 1:
-        response = f'Sorry, your command is invalid. Try `{prefix}commands` for a complete list of valid commands.'
-        await ctx.send(response)
-        return
-
-    category = args[0] if args else None
-
-    print('  Retrieving jokes...')
-    j = await Jokes()
-    joke = None
-
-    # jokes with category
-    if category:
-        print(f'  Searching for {category} jokes...')
-        if category in BLACKLISTED:
-            jokes = await j.get_joke(amount=10)
-            while True:
-                joke = find_specific_joke(jokes, category)
-                if joke:
-                    break
-        elif category in CATEGORIES:
-            joke = await j.get_joke(category=[category])
-        else:
-            print(f'  No such joke with {category} category...')
-            response = f'Sorry, there is no such category for `{category}` jokes in my database.'
-            await ctx.send(response)
-
-    # jokes without categories
-    else:
-        joke = await j.get_joke()
-
-    if joke:
-        print(
-            f'  Joke found with category: {joke["category"]}, flags: {joke["flags"]}...')
-
-        # one-liner jokes
-        if joke['type'] == 'single':
-            response = joke['joke']
-            await ctx.send(response)
-
-        # jokes with setup and delivery
-        else:
-            response = '*' + joke['setup'] + '*'
-            await ctx.send(response)
-            response = '*||' + joke['delivery'] + '||*'
-            await ctx.send(response)
-
-        print('  Joke delivered successfully...')
+    print(f'  Loading extension {extension}...')
+    client.load_extension(f'cogs.{extension}')
+    await ctx.send(f'`{extension}` loaded.')
 
 
 @client.command()
-async def leaderboards(ctx, *args):
-    """Display leaderboards of monitored words.
-        Parameters:
+async def reload(ctx, extension):
+    """
+        Unload and loads an extension.
+        Params:
             ctx (message.context): message sent.
-            *args (str): monitored word to check.
+            extension (str): extension to reload.
     """
 
-    # Only allow commands in bot-commands channel
-    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
+    # Only allow if devmode is on
+    if not DEVMODE:
+        await ctx.send(f'`devmode` is **off**.')
         return
-
-    word = args[0] if args else None
-
-    # Invalid input
-    if len(args) > 1:
-        print(f'  Invalid commands for {prefix}leaderboards {args}...')
-        response = f'Sorry, your command is invalid. Try `{prefix}commands` for a complete list of valid commands.'
-        await ctx.send(response)
-        return
-    elif word and word not in WORDS_COUNTED:
-        print(f'  Invalid commands for {prefix}leaderboards {args}...')
-        response = f'The word `{word}` is currently not being monitored. Use `{prefix}monitored_words` to display a list of monitored words.'
-        await ctx.send(response)
-        return
-
-    embed = discord.Embed(
-        title='Leaderboards',
-        color=0x5865f2)
-
-    with Database(DB_FILE) as db:
-        # leaderboards with specified word
-        if word:
-            leaderboards = db.get_leaderboards(word=word)
-            print('  Showing leaderboards for {word}...')
-        # leaderboards
-        else:
-            leaderboards = db.get_leaderboards()
-            print(f'  Showing leaderboards...')
-        for word, results in leaderboards.items():
-            value = ''
-            for result in results:
-                member = await ctx.guild.fetch_member(
-                    int(result['author']))
-                value += f'{member.name}#{member.discriminator} : `{result["count"]}`\n'
-
-            embed.add_field(
-                name=word.capitalize(),
-                value=value,
-                inline=True)
-
-    value = f'Type `{prefix}leaderboards` to display all leaderboards.' if args else f'Type `{prefix}leaderboards <monitored_word>` to display word-specific leaderboard.'
-    embed.add_field(
-        name='\u1CBC\u1CBC',
-        value=value,
-        inline=False)
-    await ctx.send(content=None, embed=embed)
-
-
-@client.group()
-async def monitored(ctx):
-
-    # Only allow commands in bot-commands channel
-    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
-        return
-
-    if ctx.invoked_subcommand is None:
-        response = f'Sorry, your command is either wrong or insufficient. Try `{prefix}commands` for a complete list of valid commands.'
-        await ctx.send(response)
-
-
-@monitored.command()
-async def words(ctx):
-    """Display monitored words.
-        Parameters:
-            ctx (message.context): message sent.
-    """
-
-    # Only allow commands in bot-commands channel
-    if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
-        return
-
-    embed = discord.Embed(
-        title='List of Monitored Words',
-        color=0x5c64f4)
-
-    with Database(DB_FILE) as db:
-        print(f'  Calculating total mentions...')
-        print(f'  Showing monitored words...')
-        # count total mentions of each monitored word
-        for word in WORDS_COUNTED:
-            total_mentions = db.count_mentions('word_counter',
-                                               word=word)
-            embed.add_field(
-                name=word.capitalize(),
-                value=f'Total mentions: `{total_mentions}`',
-                inline=True)
-        embed.add_field(
-            name='\u1CBC\u1CBC',
-            value=f'Type `{prefix}leaderboards` to display all leaderboards.',
-            inline=False)
-    await ctx.send(content=None, embed=embed)
+    
+    print(f'  Reloading {extension}...')
+    client.unload_extension(f'cogs.{extension}')
+    client.load_extension(f'cogs.{extension}')
+    await ctx.send(f'`{extension}` reloaded.')
 
 
 @client.command()
@@ -466,7 +309,7 @@ async def stats(ctx):
             ctx (message.context): message sent.
     """
 
-    # Only allow commands in bot-commands channel
+    # only allow commands in bot-commands channel
     if ctx.channel.name not in BOT_RESTRICTIONS['allowed-channels']:
         return
 
@@ -480,20 +323,56 @@ async def stats(ctx):
         name='Thesis Bot',
         icon_url=client.user.avatar_url)
 
+    # display bot statistics
     print('  Showing bot statistics...')
     for key, value in STATS.items():
         if key == 'Bot Developers':
             authors = []
             for val in value:
-                print(val['discordId'])
                 member = await client.fetch_user(int(val['discordId']))
-                authors.append(f'{member.name}#{member.discriminator} <@{val["discordId"]}>')
+                authors.append(f'<@{val["discordId"]}> {member.name}#{member.discriminator}')
             value = '\n'.join(authors)
         
         embed.add_field(
             name=key,
             value=value)
+    
+    embed.set_footer(text=' ')
+
     await ctx.send(content=None, embed=embed)
 
+
+@client.command()
+async def test(ctx):
+    """ development command for testing purposes """
+    print(ctx.guild.id)
+
+
+@client.command()
+async def unload(ctx, extension):
+    """
+        Unload an extension. 
+
+        Params:
+            ctx (message.context): message sent.
+            extension (str): extension to unload.
+    """
+
+    # Only allow if devmode is on
+    if not DEVMODE:
+        await ctx.send(f'`devmode` is **off**.')
+        return
+
+    print(f'  Unloading {extension}...')
+    client.unload_extension(f'cogs.{extension}')
+    await ctx.send(f'`{extension}` unloaded.')
+
+
+# Load all cogs
+print('  Loading all cogs...')
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+        client.load_extension(f'cogs.{filename[:-3]}')
+print('  Getting bot ready...')
 
 client.run(token)
