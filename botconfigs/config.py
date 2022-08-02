@@ -58,7 +58,7 @@ STATS = {
 DB_FILE = str(BASE_DIR / 'botconfigs' / 'discord_db.db')
 
 # Bot
-BOT_PREFIX = '$'
+BOT_PREFIX = '!'
 
 BOT_COMMANDS = [
         {'command': 'commands', 'response': 'Lists all bot commands.'},

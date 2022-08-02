@@ -27,18 +27,14 @@ async def on_ready():
 
     # TODO: Initialize global variables
     print('  Initializing global variables...')
-    global EPICGAMES, MONITORED_WORDS, DEVMODE
-
-    print('    Initializing MONITORED_WORDS...')
-    with Database(DB_FILE) as db:
-        MONITORED_WORDS = db.get_all_words()
+    global EPICGAMES, DEVMODE
 
     print('    Initializing EPICGAMES...')
     EPICGAMES = client.get_cog('EpicGamesCog')
 
     # Turn DEVMODE off by default
     print('    Turning DEVMODE off by default...')
-    DEVMODE = False
+    DEVMODE = {0: False}
 
     print('  Global variables initialized...')
 
@@ -61,6 +57,11 @@ async def on_message(message):
     # ignore bot messages including self
     if message.author == client.user or message.author.bot:
         return
+
+    # update MONITORED_WORDS
+    print('    Initializing MONITORED_WORDS...')
+    with Database(DB_FILE) as db:
+        MONITORED_WORDS = db.get_all_words()
     
     print('Message from {0.author}: {0.content}'.format(message))
 
@@ -248,16 +249,19 @@ async def devmode(ctx, *args):
 
     global DEVMODE
 
+    if ctx.guild.id not in DEVMODE:
+        DEVMODE[ctx.guild.id] = False
+
     status = args[0] if len(args) == 1 else None
 
     if status == 'on':
-        DEVMODE = True
+        DEVMODE[ctx.guild.id] = True
         response = '`devmode` is now **on**.'
     elif status == 'off':
-        DEVMODE = False
+        DEVMODE[ctx.guild.id] = False
         response = '`devmode` is now **off**.'
     else:
-        response = '`devmode` is currently **{}**.'.format('on' if DEVMODE else 'off')
+        response = '`devmode` is currently **{}**.'.format('on' if DEVMODE[ctx.guild.id] else 'off')
     
     await ctx.send(response)
 
@@ -273,7 +277,7 @@ async def load(ctx, extension):
     """
 
     # Only allow if devmode is on
-    if not DEVMODE:
+    if not DEVMODE[ctx.guild.id]:
         await ctx.send(f'`devmode` is **off**.')
         return
 
@@ -292,7 +296,7 @@ async def reload(ctx, extension):
     """
 
     # Only allow if devmode is on
-    if not DEVMODE:
+    if not DEVMODE[ctx.guild.id]:
         await ctx.send(f'`devmode` is **off**.')
         return
     
@@ -359,7 +363,7 @@ async def unload(ctx, extension):
     """
 
     # Only allow if devmode is on
-    if not DEVMODE:
+    if not DEVMODE[ctx.guild.id]:
         await ctx.send(f'`devmode` is **off**.')
         return
 
