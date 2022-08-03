@@ -155,7 +155,7 @@ async def check_epicgames_updates():
     now  = get_local_time_now('%H:%M:%S')
 
     # only check for updates at 11:00 PM Manila Time
-    if now != get_datetime('17:30:00', '%H:%M:%S'):
+    if now != get_datetime('18:00:00', '%H:%M:%S'):
         return
 
     with Database(DB_FILE) as db:
