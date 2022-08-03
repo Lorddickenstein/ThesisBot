@@ -21,7 +21,7 @@ def utc_to_local(utc) -> str:
 
 
 def get_local_time_now(format='%Y-%m-%d %H:%M:%S') -> datetime:
-    """ return local time as string """
+    """ return local time as datetime object """
 
     now = datetime.now().strftime(format)
     now = datetime.strptime(now, format)
@@ -34,9 +34,9 @@ def get_uct_time(str) -> datetime:
 
 
 def get_datetime(str, format='%Y-%m-%d %H:%M:%S') -> datetime:
-    """ returns datetime obj """
+    """ returns time as datetime object """
     return datetime.strptime(str, format)
 
 def format_date(datetime_obj, format='%b %d, %Y %I:%M %p') -> str:
-    """ returns formatted date """
+    """ returns formatted date as string """
     return datetime_obj.strftime(format)
