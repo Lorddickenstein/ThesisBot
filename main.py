@@ -42,7 +42,7 @@ async def on_ready():
         check_epicgames_updates.start()
 
     print('  Bot ready, awaiting commands...')
-    await client.change_presence(activity=discord.Game(name="your mom"))
+    await client.change_presence(activity=discord.Game(name="!commands"))
 
 
 @client.event
@@ -152,10 +152,10 @@ async def check_epicgames_updates():
         Check if there are new updates in Epic Games Store every 24 hours
     """
     
-    now  = get_local_time_now('%H:%M:%S')
+    now  = get_local_time_now('%Y-%m-%d %H:%M:%S')
 
     # only check for updates at 11:00 PM Manila Time
-    if now != get_datetime('18:00:00', '%H:%M:%S'):
+    if now.time() != get_datetime('23:00:05', '%H:%M:%S').time():
         return
 
     with Database(DB_FILE) as db:
@@ -192,12 +192,12 @@ async def check_epicgames_updates():
             if (channel.type == discord.ChannelType.text) and (channel.name == 'free-games-reminder'):
                 if ctr > 0:
                     await EPICGAMES.init()
-                    await channel.send(f'Update as of **{now}**:')
+                    await channel.send(f'Update as of **{format_date(now, "%b %d, %Y %I:%M %p")}**.\nEpic Games Store has updated their free games list. Check out the Epic Games Store now at https://store.epicgames.com/en-US/free-games/ to get your free games of the week.')
                     embeds = await EPICGAMES.get_embeds('now') + await EPICGAMES.get_embeds('later')
                     for embed in embeds:
                         await channel.send(content=None, embed=embed)
-                else:
-                    await channel.send(f'No updates as of **{now}**.')
+                # else:
+                #     await channel.send(f'Update as of **{format_date(now, "%b %d, %Y %I:%M %p")}**. There are no new games today.')
 
 
 @client.command()
