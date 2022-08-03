@@ -155,7 +155,7 @@ async def check_epicgames_updates():
     now  = get_local_time_now('%H:%M:%S')
 
     # only check for updates at 11:00 PM Manila Time
-    if now != get_datetime('23:00:00', '%H:%M:%S'):
+    if now != get_datetime('17:30:00', '%H:%M:%S'):
         return
 
     with Database(DB_FILE) as db:
@@ -186,17 +186,18 @@ async def check_epicgames_updates():
         if ctr > 0:
             print('  Found {} new updates...'.format(ctr))
 
-            # send embedded messages to discord channel #free-games-reminder
-            print('  Showing current and upcoming free games...')
-            for channel in client.get_all_channels():
-                if (channel.type == discord.ChannelType.text) and (channel.name == 'free-games-reminder'):
+        # send embedded messages to discord channel #free-games-reminder
+        print('  Showing current and upcoming free games...')
+        for channel in client.get_all_channels():
+            if (channel.type == discord.ChannelType.text) and (channel.name == 'free-games-reminder'):
+                if ctr > 0:
                     await EPICGAMES.init()
                     await channel.send(f'Update as of **{now}**:')
                     embeds = await EPICGAMES.get_embeds('now') + await EPICGAMES.get_embeds('later')
                     for embed in embeds:
                         await channel.send(content=None, embed=embed)
-        else:
-            print('  No new updates...')
+                else:
+                    await channel.send(f'No updates as of **{now}**.')
 
 
 @client.command()
