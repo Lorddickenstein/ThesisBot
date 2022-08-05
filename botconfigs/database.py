@@ -217,9 +217,10 @@ class Database:
 			for game in games_dict:
 				# convert to datetime objects to allow operations
 				end_date = game['endDate']
-				start_date = game['endDate']
+				start_date = game['startDate']
 
 				status = ''
+				print(f'    Checking game {game["title"]}...')
 
 				# check and update status
 				if game['status'] == 'active' and end_date < now:

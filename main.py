@@ -155,7 +155,7 @@ async def check_epicgames_updates():
     now  = get_local_time_now('%Y-%m-%d %H:%M:%S')
 
     # only check for updates at 11:00 PM Manila Time
-    if now.time() != get_datetime('23:00:05', '%H:%M:%S').time():
+    if now.time() != get_datetime('23:00:10', '%H:%M:%S').time():
         return
 
     with Database(DB_FILE) as db:
@@ -184,7 +184,7 @@ async def check_epicgames_updates():
                         icon=game['icon'],
                         status=game['status'])
         if ctr > 0:
-            print('  Found {} new updates...'.format(ctr))
+            print('  Found {} new game{}...'.format(ctr, "s" if ctr > 1 else ""))
 
         # send embedded messages to discord channel #free-games-reminder
         print('  Showing current and upcoming free games...')
