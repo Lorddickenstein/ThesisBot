@@ -1,3 +1,4 @@
+from tkinter import E
 import discord
 import logging
 import os
@@ -27,10 +28,7 @@ async def on_ready():
 
     # TODO: Initialize global variables
     print('  Initializing global variables...')
-    global EPICGAMES, DEVMODE
-
-    print('    Initializing EPICGAMES...')
-    EPICGAMES = client.get_cog('EpicGamesCog')
+    global DEVMODE
 
     # Turn DEVMODE off by default
     print('    Turning DEVMODE off by default...')
@@ -158,6 +156,9 @@ async def check_epicgames_updates():
     if now.time() != get_datetime('23:00:10', '%H:%M:%S').time():
         return
 
+    # initializing epicgames
+    epicgames = client.get_cog('EpicGamesCog')
+
     with Database(DB_FILE) as db:
         # update games status before getting rows
         print('  Updating games in database...')
@@ -166,7 +167,7 @@ async def check_epicgames_updates():
 
         # get current free games from epic games
         print('  Checking updates from Epic Games Store...')
-        games = await EPICGAMES.get_updates()
+        games = await epicgames.get_updates()
 
         # insert new games into database
         ctr = 0
@@ -187,17 +188,16 @@ async def check_epicgames_updates():
             print('  Found {} new game{}...'.format(ctr, "s" if ctr > 1 else ""))
 
         # send embedded messages to discord channel #free-games-reminder
-        print('  Showing current and upcoming free games...')
         for channel in client.get_all_channels():
             if (channel.type == discord.ChannelType.text) and (channel.name == 'free-games-reminder'):
                 if ctr > 0:
-                    await EPICGAMES.init()
+                    print('updating channel {}'.format(channel.id))
+                    await epicgames.init()
                     await channel.send(f'Update as of **{format_date(now, "%b %d, %Y %I:%M %p")}**.\nEpic Games Store has updated their free games list. Check out the Epic Games Store now at https://store.epicgames.com/en-US/free-games/ to get your free games of the week.')
-                    embeds = await EPICGAMES.get_embeds('now') + await EPICGAMES.get_embeds('later')
+                    
+                    embeds = await epicgames.get_embeds('now') + await epicgames.get_embeds('later')
                     for embed in embeds:
                         await channel.send(content=None, embed=embed)
-                # else:
-                #     await channel.send(f'Update as of **{format_date(now, "%b %d, %Y %I:%M %p")}**. There are no new games today.')
 
 
 @client.command()
