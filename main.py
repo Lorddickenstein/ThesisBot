@@ -1,4 +1,3 @@
-from tkinter import E
 import discord
 import logging
 import os
