@@ -223,10 +223,9 @@ class Database:
 				print(f'    Checking game {game["title"]}...')
 
 				# check and update status
-				if game['status'] == 'active' and end_date < now:
+				if end_date < now:
 					status = 'expired'
-
-				if game['status'] == 'upcoming' and start_date < now:
+				elif start_date < now:
 					status = 'active'
 
 				if status:	
