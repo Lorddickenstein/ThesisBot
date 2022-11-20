@@ -5,9 +5,11 @@ from botconfigs.config import *
 from botconfigs.database import Database
 from botconfigs.utils import get_local_time_now, get_datetime, format_date
 from discord.ext import commands, tasks
+import discord.ext.commands.bot
 
 token = os.getenv('BOT_TOKEN')
-intents = discord.Intents.default()
+intents = discord.Intents.all()
+intents.message_content = True
 client = commands.Bot(command_prefix=BOT_PREFIX, intents=intents)
 # client.remove_command('help')     # HACK: native !help command from discord.py
 
@@ -197,6 +199,23 @@ async def check_epicgames_updates():
                     embeds = await epicgames.get_embeds('now') + await epicgames.get_embeds('later')
                     for embed in embeds:
                         await channel.send(content=None, embed=embed)
+
+
+# Synchronize slash commands to tree
+@client.command()
+async def sync(ctx):
+    try:
+        fmt = await ctx.bot.tree.sync()
+        await ctx.send(f"Synced {len(fmt)} commands.")
+    except Exception as e:
+        print(e)
+
+
+# Commands test
+@client.tree.command(name='ping', description='Ping Pong')
+async def ping(interaction: discord.Interaction):
+    await interaction.response.send_message(f"pong")
+    print(f"{interaction.user} is talking to {client.user} on {interaction.guild}")
 
 
 @client.command()
