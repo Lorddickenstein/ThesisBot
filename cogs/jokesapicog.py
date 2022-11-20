@@ -104,6 +104,6 @@ class JokesApiCog(commands.Cog):
             print('  Joke delivered successfully.')
 
 
-def setup(client):
-    client.add_cog(JokesApiCog(client))
+async def setup(client):
+    await client.add_cog(JokesApiCog(client))
     print('    JokesApiCog loaded.')
