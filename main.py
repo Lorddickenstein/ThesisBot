@@ -406,4 +406,4 @@ async def setup_hook(self):
 # print('  Getting bot ready...')
 
 # client.run(token)
-client.start(token, *, reconnect=True)
+client.start(token, reconnect=True)
