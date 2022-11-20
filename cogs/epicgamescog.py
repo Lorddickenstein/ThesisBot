@@ -79,6 +79,7 @@ class EpicGamesCog(commands.Cog):
         
 
     async def fetch(self, allow_countries: str = None, verbose=False):
+        print("something is wrong")
         if allow_countries is None:
             allow_countries = self.country
 
@@ -92,7 +93,8 @@ class EpicGamesCog(commands.Cog):
             return data
 
         print('    Data not recieved...') if verbose else None
-        return print("empty")
+        print("empty")
+        return
     
 
     async def init(self, verbose=False):
