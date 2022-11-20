@@ -398,7 +398,7 @@ async def setup_hook(self):
             await self.load_extension(f'cogs.{filename[:-3]}')
     print('  Getting bot ready...')
     
-asyncio.run(setup_hook())
+asyncio.run(setup_hook(self))
     
 # # Load all cogs
 # print('  Loading all cogs...')
