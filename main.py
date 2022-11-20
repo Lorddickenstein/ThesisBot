@@ -390,12 +390,20 @@ async def unload(ctx, extension):
     client.unload_extension(f'cogs.{extension}')
     await ctx.send(f'`{extension}` unloaded.')
 
-
 # Load all cogs
-print('  Loading all cogs...')
-for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
-        client.load_extension(f'cogs.{filename[:-3]}')
-print('  Getting bot ready...')
+async def setup_hook(self):
+    print('  Loading all cogs...')
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('cog.py')L
+            await self.load_extension(f'cogs.{filename[:-3]}')
+    print('  Getting bot ready...')
+    
+# # Load all cogs
+# print('  Loading all cogs...')
+# for filename in os.listdir('./cogs'):
+#     if filename.endswith('.py'):
+#         client.load_extension(f'cogs.{filename[:-3]}')
+# print('  Getting bot ready...')
 
-client.run(token)
+# client.run(token)
+client.start(token, *, reconnect=True)
