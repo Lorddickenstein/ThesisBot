@@ -9,7 +9,7 @@ import discord.ext.commands.bot
 
 token = os.getenv('BOT_TOKEN')
 intents = discord.Intents.all()
-# intents.message_content = True
+intents.message_content = True
 client = commands.Bot(command_prefix=BOT_PREFIX, intents=intents)
 # client.remove_command('help')     # HACK: native !help command from discord.py
 
