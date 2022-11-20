@@ -1,4 +1,5 @@
 import discord
+import asyncio
 from botconfigs.config import BOT_RESTRICTIONS, BOT_PREFIX, DB_FILE
 from botconfigs.database import Database
 from discord.ext import commands
@@ -151,6 +152,6 @@ class WordsCounterCog(commands.Cog):
         await ctx.send(content=None, embed=embed)
 
 
-def setup(client):
-    client.add_cog(WordsCounterCog(client))
+async def setup(client):
+    await client.add_cog(WordsCounterCog(client))
     print('    WordsCounterCog loaded.')
