@@ -205,7 +205,7 @@ async def check_epicgames_updates():
 @client.command()
 async def sync(ctx):
     try:
-        fmt = await ctx.client.tree.sync()
+        fmt = await ctx.bot.tree.sync()
         await ctx.send(f"Synced {len(fmt)} commands.")
     except Exception as e:
         print(e)
