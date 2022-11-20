@@ -391,14 +391,14 @@ async def unload(ctx, extension):
     await ctx.send(f'`{extension}` unloaded.')
 
 # Load all cogs
-async def setup_hook():
+async def load_all_cogs():
     print('  Loading all cogs...')
     for filename in os.listdir('./cogs'):
         if filename.endswith('cog.py'):
             await client.load_extension(f'cogs.{filename[:-3]}')
     print('  Getting bot ready...')
     
-asyncio.run(setup_hook())
+asyncio.run(load_all_cogs())
     
 # # Load all cogs
 # print('  Loading all cogs...')
