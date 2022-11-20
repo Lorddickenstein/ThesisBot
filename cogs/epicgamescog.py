@@ -92,7 +92,7 @@ class EpicGamesCog(commands.Cog):
             return data
 
         print('    Data not recieved...') if verbose else None
-        return
+        return print("empty")
     
 
     async def init(self, verbose=False):
