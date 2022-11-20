@@ -241,6 +241,6 @@ class EpicGamesCog(commands.Cog):
             await ctx.send(content=None, embed=embed)
         
 
-def setup(client):
-    client.add_cog(EpicGamesCog(client))
+async def setup(client):
+    await client.add_cog(EpicGamesCog(client))
     print('    EpicGamesCog extension loaded.')
