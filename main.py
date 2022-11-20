@@ -1,11 +1,11 @@
 import discord
 import logging
 import os
+import asyncio
 from botconfigs.config import *
 from botconfigs.database import Database
 from botconfigs.utils import get_local_time_now, get_datetime, format_date
 from discord.ext import commands, tasks
-import discord.ext.commands.bot
 
 token = os.getenv('BOT_TOKEN')
 intents = discord.Intents.all()
@@ -398,6 +398,8 @@ async def setup_hook(self):
             await self.load_extension(f'cogs.{filename[:-3]}')
     print('  Getting bot ready...')
     
+asyncio.run(setup_hook())
+    
 # # Load all cogs
 # print('  Loading all cogs...')
 # for filename in os.listdir('./cogs'):
@@ -405,5 +407,4 @@ async def setup_hook(self):
 #         client.load_extension(f'cogs.{filename[:-3]}')
 # print('  Getting bot ready...')
 
-# client.run(token)
-client.start(token, reconnect=True)
+client.run(token)
