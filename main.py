@@ -395,7 +395,7 @@ async def setup_hook(self):
     print('  Loading all cogs...')
     for filename in os.listdir('./cogs'):
         if filename.endswith('cog.py'):
-            await self.load_extension(f'cogs.{filename[:-3]}')
+            await client.load_extension(f'cogs.{filename[:-3]}')
     print('  Getting bot ready...')
     
 asyncio.run(setup_hook(self))
